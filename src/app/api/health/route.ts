@@ -1,10 +1,12 @@
 import { adminClient } from "@/lib/supabase/admin";
+import { normalizeSupabaseUrl } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
 // Diagnóstico sem expor segredos: variáveis presentes e acesso ao banco/auth.
 export async function GET() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  const url = normalizeSupabaseUrl(raw);
   const pub = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
   let host = "";
   try {
@@ -13,6 +15,7 @@ export async function GET() {
   } catch {}
   const env = {
     urlValue: host || "inválida",
+    urlColada: raw === url ? "ok" : "tinha sufixo extra (corrigido no código)",
     url: /^https:\/\/[a-z0-9]+\.supabase\.co\/?$/.test(url) ? "ok" : url ? "formato inesperado" : "ausente",
     publishableKey: pub ? (pub.startsWith("sb_secret") ? "é a secret key!" : "ok") : "ausente",
     secretKey: process.env.SUPABASE_SECRET_KEY ? "ok" : "ausente",

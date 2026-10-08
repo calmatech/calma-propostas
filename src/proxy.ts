@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { shortHosts } from "@/lib/env";
+import { env, shortHosts } from "@/lib/env";
 
 export async function proxy(req: NextRequest) {
   const host = (req.headers.get("host") || "").split(":")[0].toLowerCase();
@@ -17,8 +17,8 @@ export async function proxy(req: NextRequest) {
   // Sessão do Supabase (renova o token) + proteção do painel
   let res = NextResponse.next({ request: req });
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    env.supabaseUrl(),
+    env.supabaseKey(),
     {
       cookies: {
         getAll: () => req.cookies.getAll(),
