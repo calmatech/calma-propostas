@@ -161,15 +161,18 @@ p{margin:0 0 1em}
 .invest-head{grid-area:head}
 .invest-sub{max-width:24em;margin:24px 0 0}
 /* card de pagamento: selo, valor conforme a opção, texto e seletor */
-.paycard{grid-area:card;position:relative;background:var(--card);border:1px solid var(--line);border-radius:28px;padding:clamp(36px,4vw,52px) clamp(20px,3vw,40px) clamp(14px,1.6vw,20px)}
-.paycard .badge{position:absolute;top:0;right:clamp(20px,3vw,36px);transform:translateY(-50%);font:500 14px/1 var(--sans);padding:9px 14px;border-radius:10px;border:1px solid var(--ink);background:var(--card);color:var(--ink);white-space:nowrap}
+.paycard{grid-area:card;position:relative;background:var(--card);border:1px solid color-mix(in srgb,var(--ink) 16%,var(--card));border-radius:28px;padding:clamp(48px,5vw,64px) clamp(22px,3vw,40px) clamp(14px,1.6vw,20px)}
+.paycard .badge{position:absolute;top:0;left:clamp(26px,3.4vw,44px);transform:translateY(-50%);font:500 15px/1 var(--sans);padding:11px 16px;border-radius:12px;border:1px solid var(--ink);background:var(--card);color:var(--ink);white-space:nowrap}
 .paycard .badge.solid{background:var(--ink);color:var(--paper)}
 .paycard .badge:empty{display:none}
-.total{font:400 clamp(72px,9vw,128px)/.85 var(--serif);letter-spacing:-.035em;margin:0 0 clamp(20px,2.4vw,28px);white-space:nowrap}
-.total small{font-size:.3em;letter-spacing:0;vertical-align:1.3em;margin-right:.2em}
-.paydesc{margin:0 0 clamp(24px,3vw,32px);font-size:16px;line-height:1.65;min-height:3.3em} /* sempre 2 linhas: o card não muda de altura ao trocar a opção */
+.total{display:flex;align-items:flex-start;font:400 clamp(84px,10vw,144px)/.85 var(--serif);letter-spacing:-.035em;margin:0 0 clamp(32px,3.4vw,44px);white-space:nowrap}
+.total small{font-size:.36em;line-height:1;letter-spacing:0;margin:var(--rs-top,.02em) .16em 0 0}
+.total .times{margin-right:.3em}
+.total .times i{font-style:normal;font-size:.6em;letter-spacing:0}
+.total .times:empty{display:none}
+.paydesc{margin:0 0 clamp(20px,2.4vw,28px);font-size:16px;line-height:1.65;min-height:3.3em} /* sempre 2 linhas: o card não muda de altura ao trocar a opção */
 .paycard .swap{animation:swap .45s var(--ease)}
-.seg{display:flex;gap:4px}
+.seg{display:flex;gap:4px;border-top:1px solid var(--line);padding-top:clamp(18px,2vw,24px)}
 .seg button{flex:1;font:500 15px var(--sans);color:var(--muted);background:transparent;border:0;border-radius:999px;padding:13px 10px;cursor:pointer;transition:background .3s,color .3s;white-space:nowrap}
 .seg button:hover{color:var(--ink)}
 .seg button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
@@ -243,7 +246,7 @@ p{margin:0 0 1em}
   .person{grid-template-columns:1fr}.person .ph{width:112px}
   .next li{grid-template-columns:48px 1fr}.next span.d{grid-column:2;text-align:left}
   .seg button{padding:11px 4px;font-size:13px}
-  .total{font-size:clamp(64px,21vw,104px)}
+  .total{font-size:clamp(72px,24vw,112px)}
 }
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
@@ -391,7 +394,7 @@ p{margin:0 0 1em}
     <div class="paycard rv" style="--d:.15s">
       <span class="badge" id="paybadge"></span>
       <div aria-live="polite" id="payview">
-        <div class="total"><small id="paypre">R$</small><span id="tot"></span></div>
+        <div class="total"><span class="times" id="paytimes"></span><small>R$</small><span id="tot"></span></div>
         <p class="paydesc" id="paydesc"></p>
       </div>
       <div class="seg" role="tablist" aria-label="Formas de pagamento" id="seg"></div>
@@ -521,11 +524,11 @@ if (hasMonthly) {
 const pix = P.valorPix > 0 ? P.valorPix : P.valor;
 const desc = Math.round((1 - pix / P.valor) * 100);
 const opts = [
-  {tab: "Pix", pre: "R$", val: fmt(pix), badge: desc > 0 ? `${desc}% de desconto` : "", solid: true,
+  {tab: "Pix", val: fmt(pix), badge: desc > 0 ? `${desc}% de desconto` : "", solid: true,
    txt: "À vista, na assinatura do contrato."},
-  {tab: `${P.parcelasSemJuros}× sem juros`, pre: `${P.parcelasSemJuros}x R$`, val: fmt(P.valor / P.parcelasSemJuros), badge: "Sem juros",
+  {tab: `${P.parcelasSemJuros}× sem juros`, times: P.parcelasSemJuros, val: fmt(P.valor / P.parcelasSemJuros), badge: "Sem juros",
    txt: `Parcelado no cartão, total de R$ ${fmt(P.valor)}.`},
-  {tab: `Até ${P.parcelasMax}×`, pre: "R$", val: fmt(P.valor), badge: `Em até ${P.parcelasMax}x`,
+  {tab: `Até ${P.parcelasMax}×`, val: fmt(P.valor), badge: `Em até ${P.parcelasMax}x`,
    txt: "Parcelado no cartão, com taxas da operadora."}
 ];
 const seg = $("#seg"), view = $("#payview"), badge = $("#paybadge");
@@ -533,11 +536,19 @@ seg.innerHTML = opts.map((o, i) => `<button role="tab" type="button" aria-select
 function show(i, anim) {
   const o = opts[i];
   seg.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.i == i));
-  $("#paypre").textContent = o.pre; $("#tot").textContent = o.val; $("#paydesc").textContent = o.txt;
+  $("#paytimes").innerHTML = o.times ? `${o.times}<i>x</i>` : ""; $("#tot").textContent = o.val; $("#paydesc").textContent = o.txt;
+  fitTotal();
   badge.textContent = o.badge; badge.classList.toggle("solid", !!o.solid);
   if (anim) [view, badge].forEach(el => { el.classList.remove("swap"); void el.offsetWidth; el.classList.add("swap"); });
 }
 seg.addEventListener("click", e => { const b = e.target.closest("button"); if (b) show(+b.dataset.i, true); });
+/* se o valor (ex.: "2x R$ 2.775") não couber na largura do card, reduz só o necessário */
+function fitTotal() {
+  const t = $(".total"); t.style.fontSize = "";
+  const over = t.scrollWidth / t.clientWidth;
+  if (over > 1) t.style.fontSize = (parseFloat(getComputedStyle(t).fontSize) / over) + "px";
+}
+addEventListener("resize", fitTotal);
 show(0);
 
 /* manifesto que acende */
