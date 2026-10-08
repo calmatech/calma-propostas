@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TEMPLATES } from "@/lib/templates";
-import { fmtMoney, shortLink, statusOf, timeAgo, type ProposalRow } from "@/lib/proposals";
-import { Copy } from "@/components/copy";
+import { fmtMoney, type ProposalRow } from "@/lib/proposals";
 import { SubmitButton } from "@/components/submit-button";
 import { createProposal } from "./actions";
+import { ProposalTable } from "./proposal-table";
 
 const FILTERS = [
   { key: "", label: "Em aberto" },
@@ -85,46 +85,7 @@ export default async function ProposalsPage({ searchParams }: PageProps<"/admin"
       {list.length === 0 ? (
         <div className="card muted">Nenhuma proposta aqui ainda.</div>
       ) : (
-        <div className="tablewrap">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Proposta</th>
-                <th>Status</th>
-                <th className="hide-sm">Acessos</th>
-                <th className="hide-sm">Último acesso</th>
-                <th className="hide-sm">Valor</th>
-                <th>Link</th>
-              </tr>
-            </thead>
-            <tbody>
-              {list.map((p) => {
-                const st = statusOf(p);
-                const link = p.links?.[0];
-                return (
-                  <tr key={p.id}>
-                    <td>
-                      <Link className="row" href={`/admin/propostas/${p.id}`}>
-                        {p.client_name || "Sem nome"}
-                      </Link>
-                      <div className="muted small">
-                        {String(p.data?.projeto ?? "")} · criada {timeAgo(p.created_at)}
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`pill ${st.tone}`}>{st.label}</span>
-                      {p.approved_at && <div className="muted small">{timeAgo(p.approved_at)}</div>}
-                    </td>
-                    <td className="hide-sm">{p.view_count}</td>
-                    <td className="hide-sm muted">{timeAgo(p.last_viewed_at)}</td>
-                    <td className="hide-sm">{fmtMoney(p.data?.valor)}</td>
-                    <td>{link ? <Copy text={shortLink(link.code)} /> : <span className="muted">—</span>}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <ProposalTable list={list} all={all} />
       )}
     </>
   );

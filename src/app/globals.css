@@ -101,3 +101,20 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--ink); outli
 .funnel li[data-done] { color: var(--ink); }
 .funnel li[data-done]::before { background: var(--ok); border-color: var(--ok); }
 .funnel li[data-done] + li[data-done]::after { border-color: var(--ok); }
+
+/* linhas clicáveis da lista */
+.table tr.clickable { cursor: pointer; }
+.table tr.clickable:hover td, .table tr.clickable[aria-selected="true"] td { background: var(--tint); }
+.rowbtn { background: none; border: 0; padding: 0; font: 500 15px var(--sans); color: var(--ink); cursor: pointer; text-align: left; }
+
+/* gaveta da proposta */
+.drawer-backdrop { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); z-index: 40; animation: fadein .2s ease; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 100vw); z-index: 41; display: flex; flex-direction: column; background: var(--paper); border-left: 1px solid var(--line); box-shadow: -12px 0 40px rgba(0, 0, 0, .12); animation: slidein .28s cubic-bezier(.2, .7, .2, 1); }
+.drawer header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 22px 22px 14px; }
+.drawer header h2 { font-size: 30px; line-height: 1.05; overflow-wrap: anywhere; }
+.drawer-close { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--ink); font-size: 22px; line-height: 1; cursor: pointer; }
+.drawer-actions { display: flex; gap: 8px; padding: 0 22px 18px; border-bottom: 1px solid var(--line); }
+.drawer-body { flex: 1; overflow-y: auto; padding: 18px 22px 32px; overscroll-behavior: contain; }
+@keyframes fadein { from { opacity: 0; } }
+@keyframes slidein { from { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .drawer, .drawer-backdrop { animation: none; } }

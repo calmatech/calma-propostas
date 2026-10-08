@@ -106,6 +106,7 @@ export async function addProposalLink(id: string) {
   const { supabase, user } = await session();
   const { data: p } = await supabase.from("proposals").select("title").eq("id", id).single();
   await createShortLink(supabase, { proposal_id: id, label: p?.title ?? "", created_by: user.id });
+  revalidatePath("/admin");
   revalidatePath(`/admin/propostas/${id}`);
 }
 
