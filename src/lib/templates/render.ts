@@ -1,7 +1,7 @@
 import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { TEMPLATES, isTemplateId } from ".";
+import { TEMPLATES, isTemplateId, templateData } from ".";
 
 type RenderInput = {
   slug: string;
@@ -42,7 +42,7 @@ export function formatDateLong(iso: string) {
 export async function renderProposal(input: RenderInput) {
   const id = isTemplateId(input.template) ? input.template : "calma-v1";
   const tpl = TEMPLATES[id];
-  const data: Record<string, unknown> = { ...tpl.defaults, ...input.data };
+  const data: Record<string, unknown> = templateData(id, input.data);
   if (typeof data.validade === "string") data.validade = formatDateLong(data.validade);
 
   const cliente = String(data.cliente ?? "");

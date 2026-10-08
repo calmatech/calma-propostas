@@ -252,17 +252,29 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
       </Section>
 
       <Section title="Planos Calma Cloud">
+        <p className="hint" style={{ margin: 0 }}>
+          Valores por mês. “Anual” é o valor mensal pagando o ano à vista; “Mensal” é cobrando mês a mês. Sem valor mensal, a proposta não mostra o seletor Mensal/Anual.
+        </p>
         <Rows
           items={d.planos}
           onChange={(planos) => set({ planos })}
-          empty={["", 0, ""] as [string, number, string]}
+          empty={["", 0, "", 0] as [string, number, string, number]}
           title={(i) => `Plano ${i + 1}`}
           render={(pl, up) => (
-            <div className="grid3">
-              <input value={pl[0]} placeholder="Nome" onChange={(e) => up([e.target.value, pl[1], pl[2]])} />
-              <input inputMode="decimal" value={String(pl[1])} placeholder="R$ / mês" onChange={(e) => up([pl[0], num(e.target.value), pl[2]])} />
-              <input value={pl[2]} placeholder="Descrição" onChange={(e) => up([pl[0], pl[1], e.target.value])} />
-            </div>
+            <>
+              <div className="grid3">
+                <input value={pl[0]} placeholder="Nome" onChange={(e) => up([e.target.value, pl[1], pl[2], pl[3]])} />
+                <label className="f">
+                  <span>R$/mês no anual</span>
+                  <input inputMode="decimal" value={String(pl[1])} onChange={(e) => up([pl[0], num(e.target.value), pl[2], pl[3]])} />
+                </label>
+                <label className="f">
+                  <span>R$/mês no mensal</span>
+                  <input inputMode="decimal" value={String(pl[3] ?? "")} onChange={(e) => up([pl[0], pl[1], pl[2], e.target.value === "" ? undefined : num(e.target.value)])} />
+                </label>
+              </div>
+              <input value={pl[2]} placeholder="Descrição" onChange={(e) => up([pl[0], pl[1], e.target.value, pl[3]])} />
+            </>
           )}
         />
       </Section>

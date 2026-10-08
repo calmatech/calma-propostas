@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { TEMPLATES, isTemplateId } from "@/lib/templates";
+import { TEMPLATES, isTemplateId, templateData } from "@/lib/templates";
 import { fmtDate, publicUrl, shortLink, statusOf, timeAgo, type ProposalRow } from "@/lib/proposals";
 import { Copy } from "@/components/copy";
 import { ActionButton } from "@/components/action-button";
@@ -47,7 +47,7 @@ export default async function ProposalPage({ params }: PageProps<"/admin/propost
 
   const st = statusOf(p);
   const tplId = isTemplateId(p.template) ? p.template : "calma-v1";
-  const data = { ...TEMPLATES[tplId].defaults, ...p.data };
+  const data = templateData(tplId, p.data);
   const firstClick = (events as Event[] | null)?.filter((e) => e.type === "link_click").at(-1)?.created_at ?? null;
   const funnel: [string, string | null][] = [
     ["Clicou no link", firstClick ?? (p.links?.some((l) => l.clicks > 0) ? p.links!.find((l) => l.clicks > 0)!.last_click_at : null)],

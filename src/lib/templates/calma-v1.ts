@@ -18,7 +18,8 @@ export type CalmaV1 = {
   parcelasSemJuros: number;
   parcelasMax: number;
   dominio: number;
-  planos: [string, number, string][];
+  // [nome, R$/mês no plano anual, descrição, R$/mês no plano mensal]
+  planos: [string, number, string, number?][];
 };
 
 export const calmaV1Defaults: CalmaV1 = {
@@ -69,7 +70,21 @@ export const calmaV1Defaults: CalmaV1 = {
   parcelasMax: 12,
   dominio: 40,
   planos: [
-    ["Básica", 90, "Para sites institucionais e páginas simples."],
-    ["Pro", 170, "Para sites maiores ou com atualizações frequentes."],
+    ["Básica", 90, "Para sites institucionais e páginas simples.", 139],
+    ["Pro", 170, "Para sites maiores ou com atualizações frequentes. Inclui estrutura de blog e suporte personalizado.", 210],
   ],
 };
+
+const OLD_PRO_DESC = "Para sites maiores ou com atualizações frequentes.";
+
+// Propostas antigas guardaram planos sem o valor mensal: completa a partir dos padrões.
+export function normalizeCalmaV1(data: Record<string, unknown>): Record<string, unknown> {
+  if (!Array.isArray(data.planos)) return data;
+  const planos = (data.planos as CalmaV1["planos"]).map((pl) => {
+    const def = calmaV1Defaults.planos.find((d) => d[0] === pl[0]);
+    if (!def) return pl;
+    const desc = pl[0] === "Pro" && pl[2] === OLD_PRO_DESC ? def[2] : pl[2];
+    return [pl[0], pl[1], desc, typeof pl[3] === "number" ? pl[3] : def[3]] as CalmaV1["planos"][number];
+  });
+  return { ...data, planos };
+}
