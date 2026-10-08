@@ -234,14 +234,17 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
 
       <Section title="Investimento">
         <div className="grid2">
-          <Field label="Valor total (R$)">
+          <Field label="Valor cheio no cartão (R$)" hint="Usado no 2x sem juros e no parcelado.">
             <input inputMode="decimal" value={String(d.valor)} onChange={(e) => set({ valor: num(e.target.value) })} />
           </Field>
+          <Field label="Valor no Pix (R$)" hint={d.valorPix && d.valor > d.valorPix ? `Selo: ${Math.round((1 - d.valorPix / d.valor) * 100)}% de desconto` : "Vazio = mesmo valor do cartão, sem selo de desconto."}>
+            <input inputMode="decimal" value={d.valorPix ? String(d.valorPix) : ""} onChange={(e) => set({ valorPix: e.target.value === "" ? 0 : num(e.target.value) })} />
+          </Field>
+        </div>
+        <div className="grid3">
           <Field label="Domínio (R$ / ano)">
             <input inputMode="decimal" value={String(d.dominio)} onChange={(e) => set({ dominio: num(e.target.value) })} />
           </Field>
-        </div>
-        <div className="grid2">
           <Field label="Parcelas sem juros">
             <input type="number" min={1} value={d.parcelasSemJuros} onChange={(e) => set({ parcelasSemJuros: num(e.target.value) || 1 })} />
           </Field>

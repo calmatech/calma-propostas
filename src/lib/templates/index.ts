@@ -17,7 +17,7 @@ export type TemplateId = keyof typeof TEMPLATES;
 // Valores padrão + dados da proposta, já normalizados para a versão atual do modelo
 export function templateData(id: TemplateId, data: Record<string, unknown>) {
   const t = TEMPLATES[id];
-  return t.normalize({ ...t.defaults, ...data });
+  return t.normalize({ ...t.defaults, ...data }, data);
 }
 
 export const isTemplateId = (id: string): id is TemplateId => id in TEMPLATES;

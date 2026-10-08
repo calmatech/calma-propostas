@@ -14,7 +14,8 @@ export type CalmaV1 = {
   etapas: [string, string][];
   prazo: string;
   inicio: string;
-  valor: number;
+  valor: number; // valor cheio (cartão)
+  valorPix?: number; // à vista no Pix; o selo de desconto é calculado
   parcelasSemJuros: number;
   parcelasMax: number;
   dominio: number;
@@ -65,7 +66,8 @@ export const calmaV1Defaults: CalmaV1 = {
   ],
   prazo: "45 dias úteis",
   inicio: "Após o contrato",
-  valor: 5000,
+  valor: 5550,
+  valorPix: 4990,
   parcelasSemJuros: 2,
   parcelasMax: 12,
   dominio: 40,
@@ -77,8 +79,10 @@ export const calmaV1Defaults: CalmaV1 = {
 
 const OLD_PRO_DESC = "Para sites maiores ou com atualizações frequentes.";
 
-// Propostas antigas guardaram planos sem o valor mensal: completa a partir dos padrões.
-export function normalizeCalmaV1(data: Record<string, unknown>): Record<string, unknown> {
+// Propostas antigas: completa planos sem valor mensal e o campo Pix.
+export function normalizeCalmaV1(data: Record<string, unknown>, raw: Record<string, unknown> = data): Record<string, unknown> {
+  // proposta salva antes do campo Pix: Pix = valor do cartão (sem selo de desconto)
+  if ("valor" in raw && !("valorPix" in raw)) data = { ...data, valorPix: 0 };
   if (!Array.isArray(data.planos)) return data;
   const planos = (data.planos as CalmaV1["planos"]).map((pl) => {
     const def = calmaV1Defaults.planos.find((d) => d[0] === pl[0]);
