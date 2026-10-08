@@ -108,6 +108,8 @@ p{margin:0 0 1em}
 .manifest .big{font:400 clamp(28px,3.4vw,44px)/1.2 var(--serif);margin:0}
 .manifest .big .wd{opacity:.18;transition:opacity .4s}
 .manifest .big .wd.lit{opacity:1}
+/* desktop: manifesto ocupa ~95% da altura da tela, conteúdo centralizado */
+@media screen and (min-width:861px){#sobre{min-height:95svh;display:flex;align-items:center}#sobre .in{width:100%}}
 
 /* time + números */
 .team{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,4vw,40px);margin-top:clamp(40px,6vw,64px)}
