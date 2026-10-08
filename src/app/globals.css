@@ -86,3 +86,9 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--ink); outli
 .err { color: var(--err); font-size: 14px; }
 .stat b { display: block; font: 400 36px/1 var(--serif); }
 .stat span { font-size: 13px; color: var(--muted); }
+
+/* skeleton */
+.sk { display: block; border-radius: 8px; background: linear-gradient(90deg, var(--tint) 0%, var(--line) 50%, var(--tint) 100%); background-size: 200% 100%; animation: sk 1.2s ease-in-out infinite; }
+@keyframes sk { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
+

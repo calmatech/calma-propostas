@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { TEMPLATES } from "@/lib/templates";
 import { fmtMoney, shortLink, statusOf, timeAgo, type ProposalRow } from "@/lib/proposals";
 import { Copy } from "@/components/copy";
+import { SubmitButton } from "@/components/submit-button";
 import { createProposal } from "./actions";
 
 const FILTERS = [
@@ -52,7 +53,7 @@ export default async function ProposalsPage({ searchParams }: PageProps<"/admin"
               ))}
             </select>
           )}
-          <button className="btn">Nova proposta +</button>
+          <SubmitButton pending="Criando…">Nova proposta +</SubmitButton>
         </form>
       </div>
 

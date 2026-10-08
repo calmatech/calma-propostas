@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUser } from "@/lib/supabase/server";
 import { signOut } from "@/app/login/actions";
 import { Nav } from "./nav";
+import { RefreshOnFocus } from "./refresh-on-focus";
 
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   const user = await getUser();
@@ -22,6 +23,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
         </div>
       </header>
       <main className="wrap">{children}</main>
+      <RefreshOnFocus />
     </>
   );
 }

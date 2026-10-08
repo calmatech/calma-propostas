@@ -2,15 +2,14 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getUser } from "@/lib/supabase/server";
 import { newShortCode, newSlug } from "@/lib/ids";
 import { TEMPLATES, isTemplateId } from "@/lib/templates";
 
 async function session() {
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) redirect("/login");
-  return { supabase, user: data.user };
+  const [supabase, user] = await Promise.all([createClient(), getUser()]);
+  if (!user) redirect("/login");
+  return { supabase, user };
 }
 
 type Supa = Awaited<ReturnType<typeof session>>["supabase"];
@@ -55,12 +54,11 @@ export async function createProposal(form: FormData) {
 
 export async function saveProposal(id: string, data: Record<string, unknown>) {
   const { supabase } = await session();
-  const { error } = await supabase
-    .from("proposals")
-    .update({ data, client_name: String(data.cliente ?? ""), title: titleOf(data) })
-    .eq("id", id);
+  const [{ error }] = await Promise.all([
+    supabase.from("proposals").update({ data, client_name: String(data.cliente ?? ""), title: titleOf(data) }).eq("id", id),
+    supabase.from("links").update({ label: titleOf(data) }).eq("proposal_id", id),
+  ]);
   if (error) return { ok: false as const, error: error.message };
-  await supabase.from("links").update({ label: titleOf(data) }).eq("proposal_id", id);
   revalidatePath("/admin");
   revalidatePath(`/admin/propostas/${id}`);
   return { ok: true as const, savedAt: new Date().toISOString() };

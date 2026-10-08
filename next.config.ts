@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // páginas já visitadas reabrem na hora (as ações de salvar invalidam o cache)
+    staleTimes: { dynamic: 30, static: 300 },
+  },
   // os HTMLs dos modelos são lidos em runtime
   outputFileTracingIncludes: {
     "/p/[slug]": ["./templates/**/*.html"],
