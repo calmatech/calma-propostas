@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/supabase/server";
 import { signOut } from "@/app/login/actions";
+import { Logo } from "@/components/logo";
 import { Nav } from "./nav";
 import { RefreshOnFocus } from "./refresh-on-focus";
 
@@ -12,8 +13,9 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     <>
       <header className="top">
         <div className="wrap">
-          <Link href="/admin" className="logo">
-            Calma <b>propostas</b>
+          <Link href="/admin" className="logo" aria-label="Calma propostas, início">
+            <Logo height={17} />
+            <b>propostas</b>
           </Link>
           <Nav />
           <form action={signOut} className="inline">

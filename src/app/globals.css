@@ -20,8 +20,8 @@ h2 { font-size: 28px; line-height: 1.1; }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 .top { border-bottom: 1px solid var(--line); background: var(--card); position: sticky; top: 0; z-index: 5; }
 .top .wrap { display: flex; align-items: center; gap: 24px; height: 60px; }
-.logo { font: 400 22px/1 var(--serif); text-decoration: none; }
-.logo b { font-weight: 400; font-style: italic; }
+.logo { display: inline-flex; align-items: baseline; gap: 8px; text-decoration: none; }
+.logo b { font: italic 400 22px/1 var(--serif); }
 .top nav { display: flex; gap: 18px; flex: 1; }
 .top nav a { text-decoration: none; color: var(--muted); font-size: 14px; }
 .top nav a:hover, .top nav a[aria-current] { color: var(--ink); }

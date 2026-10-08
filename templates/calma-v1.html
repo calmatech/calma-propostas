@@ -9,7 +9,7 @@
 <!--__HEAD__-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add("js")</script>
 <style>
 :root{
@@ -17,7 +17,6 @@
   --night:#222222; --night-ink:#F4F4F2; --night-muted:#A6A6A2; --night-line:#3B3B3B; --night-card:#2B2B2B;
   --serif:"Instrument Serif","Times New Roman",Georgia,serif;
   --sans:"Plus Jakarta Sans","Helvetica Neue",Arial,sans-serif;
-  --logo:"Anton","Arial Narrow",Impact,sans-serif;
   --pad:clamp(20px,5vw,64px);
   --ease:cubic-bezier(.2,.7,.2,1);
   box-sizing:border-box;
@@ -44,8 +43,8 @@ p{margin:0 0 1em}
 .h2{font-size:clamp(44px,7vw,84px);line-height:.98}
 .h2 em{font-style:italic}
 .lead{font-size:clamp(17px,1.8vw,20px);line-height:1.65;max-width:34em}
-.wm{font-family:var(--logo);line-height:.9;text-decoration:none;white-space:nowrap}
-.wm sup{font:600 .22em var(--sans);vertical-align:1.1em;margin-left:.15em}
+.logo{display:block;fill:currentColor;aspect-ratio:1242/349;width:auto}
+.wm{display:inline-flex;color:inherit;text-decoration:none}
 .btn{display:inline-flex;align-items:center;gap:10px;font:500 15px var(--sans);text-decoration:none;border-radius:999px;padding:14px 24px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;transition:transform .25s var(--ease),background .25s,color .25s}
 .btn:hover{transform:translateY(-2px)}
 .btn.ghost{background:transparent;color:var(--ink)}
@@ -63,7 +62,7 @@ p{margin:0 0 1em}
 .bar{position:fixed;inset:0 0 auto 0;z-index:10;padding-top:env(safe-area-inset-top,0px);transition:background .3s,border-color .3s,backdrop-filter .3s;border-bottom:1px solid transparent}
 .bar.on{background:color-mix(in srgb,var(--paper) 86%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:var(--line)}
 .bar .in{display:flex;align-items:center;justify-content:space-between;height:68px;gap:20px}
-.bar .wm{font-size:28px}
+.bar .wm .logo{height:22px}
 .bar nav{display:flex;align-items:center;gap:clamp(16px,2.6vw,32px);font-size:14px}
 .bar nav a.l{text-decoration:none;color:var(--muted);transition:color .2s}
 .bar nav a.l:hover,.bar nav a.l.cur{color:var(--ink)}
@@ -206,8 +205,8 @@ p{margin:0 0 1em}
 .end{padding:clamp(96px,14vw,180px) 0 32px;overflow:hidden}
 .end .thx{font:400 clamp(60px,11vw,160px)/.9 var(--serif);letter-spacing:-.03em;margin:0}
 .end .thx em{font-style:italic}
-.giant{font-family:var(--logo);font-size:clamp(110px,26vw,400px);line-height:.8;letter-spacing:-.01em;margin:clamp(56px,8vw,96px) 0 0;color:var(--night-ink);white-space:nowrap}
-.giant sup{font:600 .06em var(--sans);vertical-align:1.6em}
+.giant{margin:clamp(56px,8vw,96px) 0 0;color:var(--night-ink)}
+.giant .logo{width:100%;height:auto}
 .foot{display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--night-line);padding-top:18px;margin-top:28px;font-size:14px;color:var(--night-muted)}
 .foot a{text-decoration:none}
 
@@ -257,10 +256,11 @@ p{margin:0 0 1em}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="calma-logo" viewBox="42 51 1242 349"><path d="M1035.51 55.5282H1117.01L1187.2 395.139H1132.41L1117.47 318.161H1035.06L1020.11 395.139H965.321L1035.51 55.5282ZM1044.56 268.351H1107.96L1076.26 104.885L1044.56 268.351Z"/><path d="M837.5 395.139H771.841L711.617 98.0926V395.139H661.805V55.5282H754.179L806.706 316.35L857.422 55.5282H951.608V395.139H897.269V100.357L837.5 395.139Z"/><path d="M648.407 345.33V395.139H488.11V55.5282H542.449V345.33H648.407Z"/><path d="M322.942 55.5282H404.449L474.634 395.139H419.844L404.9 318.161H322.489L307.546 395.139H252.756L322.942 55.5282ZM331.999 268.351H395.392L363.694 104.885L331.999 268.351Z"/><path d="M191.429 263.823H245.767V281.936C245.767 360.726 207.278 399.666 143.883 399.666C80.4893 399.666 42 360.726 42 281.936V168.732C42 89.942 80.4893 51 143.883 51C207.278 51 245.767 89.942 245.767 168.732V182.316H191.429V168.732C191.429 117.564 173.769 100.81 143.883 100.81C114.45 100.81 96.3378 117.564 96.3378 168.732V281.936C96.3378 333.104 113.998 349.858 143.883 349.858C173.316 349.858 191.429 333.104 191.429 281.936V263.823Z"/><path d="M1252 332.167C1234.35 332.167 1219.99 346.556 1219.99 364.242C1219.99 381.93 1234.35 396.318 1252 396.318C1269.65 396.318 1284 381.93 1284 364.242C1284 346.556 1269.65 332.167 1252 332.167ZM1276.14 364.242C1276.14 377.811 1265.53 388.439 1252 388.439C1238.46 388.439 1227.85 377.811 1227.85 364.242C1227.85 350.674 1238.46 340.046 1252 340.046C1265.53 340.046 1276.14 350.674 1276.14 364.242Z"/><path d="M1260.07 368.976C1264.54 367.013 1266.81 363.853 1266.81 359.567C1266.81 352.953 1261.7 348.508 1254.11 348.508H1238.86V379.3H1246.72V370.514H1251.89L1259.1 379.3H1267.36V377.578L1261.62 370.673C1261.09 369.976 1260.53 369.399 1260.07 368.976ZM1258.94 359.567C1258.94 362.268 1257.05 363.635 1253.34 363.635H1246.72V355.389H1253.11C1256.98 355.389 1258.94 356.795 1258.94 359.567Z"/></symbol></svg>
 
 <header class="bar" id="bar">
   <div class="in">
-    <a class="wm" href="#topo" aria-label="Calma, voltar ao início">CALMA<sup>®</sup></a>
+    <a class="wm" href="#topo" aria-label="Calma, voltar ao início"><svg class="logo" viewBox="0 0 1242 349" aria-hidden="true"><use href="#calma-logo"/></svg></a>
     <nav aria-label="Seções da proposta">
       <a class="l" href="#sobre">Sobre</a>
       <a class="l" href="#proposta">Proposta</a>
@@ -299,7 +299,7 @@ p{margin:0 0 1em}
 <!-- MANIFESTO -->
 <section class="sec" id="sobre" data-track="sobre">
   <div class="in manifest">
-    <div class="rv"><span class="kicker">Estúdio Calma</span><span class="wm" style="font-size:clamp(72px,10vw,132px)">CALMA<sup>®</sup></span></div>
+    <div class="rv"><span class="kicker">Estúdio Calma</span><span class="wm"><svg class="logo" style="height:clamp(52px,7.4vw,96px)" viewBox="42 51 1242 349" role="img" aria-label="Calma"><use href="#calma-logo"/></svg></span></div>
     <p class="big" id="manif">Num mundo que disputa atenção o tempo todo, projetar com calma é criar o que não grita, mas convida. É criar com sensibilidade e intenção, com marcas e com tecnologias, abrindo espaço para o que é humano e vivo.</p>
   </div>
 </section>
@@ -439,7 +439,7 @@ p{margin:0 0 1em}
 <footer class="night end">
   <div class="in">
     <p class="thx rv">Muito <em>obrigada.</em></p>
-    <div class="giant rv" aria-hidden="true">CALMA<sup>®</sup></div>
+    <div class="giant rv" aria-hidden="true"><svg class="logo" viewBox="0 0 1242 349"><use href="#calma-logo"/></svg></div>
     <div class="foot"><a href="https://estudiocalma.com.br">www.estudiocalma.com.br</a><span>2026</span></div>
   </div>
 </footer>
