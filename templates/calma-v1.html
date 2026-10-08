@@ -455,7 +455,7 @@ const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAl
 const RM = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const V = Object.assign({}, P, {dominio: P.dominio});
 $$("[data-c]").forEach(el => el.textContent = V[el.dataset.c]);
-document.title = "Proposta Calma para " + P.cliente;
+document.title = "Proposta para " + P.cliente + " | Estúdio Calma";
 const NUM = ["Zero","Um","Dois","Três","Quatro","Cinco","Seis","Sete","Oito","Nove","Dez"];
 $("[data-steps-n]").textContent = NUM[P.etapas.length] || P.etapas.length;
 const tk = (P.ticker || []).map(t => `<span>${t}</span>`).join("");

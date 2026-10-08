@@ -46,8 +46,9 @@ export async function renderProposal(input: RenderInput) {
   if (typeof data.validade === "string") data.validade = formatDateLong(data.validade);
 
   const cliente = String(data.cliente ?? "");
+  const title = `Proposta para ${cliente} | Estúdio Calma`;
   const head = [
-    `<meta property="og:title" content="${esc(`Proposta Calma para ${cliente}`)}">`,
+    `<meta property="og:title" content="${esc(title)}">`,
     `<meta property="og:description" content="${esc(String(data.projeto ?? ""))}">`,
     `<meta property="og:site_name" content="Estúdio Calma">`,
     `<meta property="og:type" content="website">`,
@@ -63,6 +64,7 @@ export async function renderProposal(input: RenderInput) {
 
   const html = await load(tpl.file);
   return html
+    .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
     .replace("<!--__HEAD__-->", head)
     .replace("/*__DATA__*/{}", safeJson(data))
     .replace("<!--__RUNTIME__-->", `<script>window.__CP__=${safeJson(cfg)};</script>\n<script src="/proposta-runtime.js" defer></script>`);
