@@ -11,6 +11,8 @@ export type ProposalRow = {
   view_count: number;
   first_viewed_at: string | null;
   last_viewed_at: string | null;
+  reached_pricing_at?: string | null;
+  approve_opened_at?: string | null;
   approved_at: string | null;
   approved_name: string | null;
   approved_note: string | null;
@@ -19,11 +21,17 @@ export type ProposalRow = {
   links?: { code: string; clicks: number; last_click_at: string | null }[];
 };
 
-export type Status = { key: "approved" | "opened" | "clicked" | "sent" | "archived"; label: string; tone: "" | "ok" | "warn" };
+export type Status = {
+  key: "approved" | "approving" | "pricing" | "opened" | "clicked" | "sent" | "archived";
+  label: string;
+  tone: "" | "ok" | "warn";
+};
 
 export function statusOf(p: ProposalRow): Status {
   if (p.archived) return { key: "archived", label: "Arquivada", tone: "" };
   if (p.approved_at) return { key: "approved", label: "Aprovada", tone: "ok" };
+  if (p.approve_opened_at) return { key: "approving", label: "Clicou em aprovar", tone: "warn" };
+  if (p.reached_pricing_at) return { key: "pricing", label: "Viu o investimento", tone: "warn" };
   if (p.first_viewed_at) return { key: "opened", label: "Visualizada", tone: "warn" };
   if (p.links?.some((l) => l.clicks > 0)) return { key: "clicked", label: "Link clicado", tone: "warn" };
   return { key: "sent", label: "Não aberta", tone: "" };

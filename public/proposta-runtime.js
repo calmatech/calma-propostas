@@ -10,28 +10,64 @@
     if (!sid) { sid = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem("cp_sid", sid); }
   } catch (e) { sid = "x" + Math.random().toString(36).slice(2); }
 
-  /* ---------- visualização ---------- */
-  function track() {
+  /* ---------- rastreamento ---------- */
+  // remove ?c=código (clique do link curto já contado no servidor) para não recontar no recarregar
+  try {
+    var u = new URL(location.href);
+    if (u.searchParams.has("c")) { u.searchParams.delete("c"); history.replaceState(null, "", u.pathname + u.search + u.hash); }
+  } catch (e) {}
+
+  function send(type, detail) {
+    if (C.preview) return;
     fetch("/api/track", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ slug: C.slug, sid: sid, ref: document.referrer || "" }),
+      body: JSON.stringify({ slug: C.slug, sid: sid, type: type, detail: detail || "", ref: document.referrer || "" }),
       keepalive: true
     }).catch(function () {});
   }
+  // uma vez por sessão do navegador
+  function once(key, fn) {
+    try { if (sessionStorage.getItem("cp_" + key)) return; sessionStorage.setItem("cp_" + key, "1"); } catch (e) {}
+    fn();
+  }
+
   if (C.preview) {
     var b = document.createElement("div");
     b.textContent = "Pré-visualização da equipe · este acesso não é contado";
     b.style.cssText = "position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;background:#222;color:#f4f4f2;font:500 13px/1 'Plus Jakarta Sans',sans-serif;padding:10px 16px;border-radius:999px;box-shadow:0 6px 24px rgba(0,0,0,.2)";
     document.body.appendChild(b);
   } else if (document.visibilityState === "visible") {
-    track();
+    send("view");
   } else {
     document.addEventListener("visibilitychange", function on() {
       if (document.visibilityState !== "visible") return;
       document.removeEventListener("visibilitychange", on);
-      track();
+      send("view");
     });
+  }
+
+  // seções vistas: conta quando a seção fica ao menos 1,5 s na tela
+  if ("IntersectionObserver" in window && !C.preview) {
+    var timers = {};
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        var name = e.target.getAttribute("data-track");
+        // seções altas no celular: vale ocupar boa parte da tela
+        var seen = e.isIntersecting && (e.intersectionRatio >= 0.35 || e.intersectionRect.height >= innerHeight * 0.4);
+        if (seen) {
+          if (timers[name]) return;
+          timers[name] = setTimeout(function () {
+            io.unobserve(e.target);
+            once("sec_" + name, function () { send("section", name); });
+          }, 1500);
+        } else {
+          clearTimeout(timers[name]);
+          timers[name] = 0;
+        }
+      });
+    }, { threshold: [0, 0.1, 0.2, 0.35, 0.5, 0.75] });
+    $$("[data-track]").forEach(function (el) { io.observe(el); });
   }
 
   /* ---------- aprovação ---------- */
@@ -99,6 +135,6 @@
   });
 
   $$("[data-approve]").forEach(function (b) {
-    b.addEventListener("click", function () { dlg.showModal(); setTimeout(function () { var i = dlg.querySelector("#ap-name"); if (i) i.focus(); }, 30); });
+    b.addEventListener("click", function () { once("approve_open", function () { send("approve_open"); }); dlg.showModal(); setTimeout(function () { var i = dlg.querySelector("#ap-name"); if (i) i.focus(); }, 30); });
   });
 })();

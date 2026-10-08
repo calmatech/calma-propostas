@@ -1,7 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { TEAM_COOKIE, TEAM_COOKIE_OPTIONS } from "@/lib/team-cookie";
 
 export async function signIn(_prev: string | null, form: FormData) {
   const supabase = await createClient();
@@ -15,6 +17,7 @@ export async function signIn(_prev: string | null, form: FormData) {
     console.error("login", error);
     return `Erro ao entrar: ${error.message}`;
   }
+  (await cookies()).set(TEAM_COOKIE, "1", TEAM_COOKIE_OPTIONS);
   const next = String(form.get("next") ?? "");
   redirect(next.startsWith("/admin") ? next : "/admin");
 }

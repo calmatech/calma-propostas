@@ -19,11 +19,13 @@ Stack: Next.js 16 (Vercel) + Supabase (Postgres + Auth).
 | Banco | `supabase/schema.sql` |
 | Encurtador (`s.tudio.cc/x` → `/l/x`) | `src/proxy.ts` + `src/app/l/[code]/route.ts` |
 
-**Rastreamento**
-- *Clique no link curto*: contado no servidor; robôs de pré-visualização (WhatsApp, iMessage, Slack…) são ignorados.
-- *Visualização*: o navegador avisa o servidor quando a página abre de verdade (precisa de JavaScript, então robô não conta).
-- *Aprovação*: o cliente clica em “Aprovar proposta”, informa o nome (e um recado opcional) e confirma.
-- Quem está logado no painel vê a proposta em **modo pré-visualização**: não conta acesso e não consegue aprovar.
+**Rastreamento (jornada do cliente)**
+- *Clicou no link*: o link curto redireciona para `/p/<slug>?c=<código>` e o clique é contado na página da proposta, onde dá para saber se é alguém da equipe. Robôs de pré-visualização (WhatsApp, iMessage, Slack…) são ignorados.
+- *Abriu a proposta*: o navegador avisa quando a página abre de verdade (precisa de JavaScript, então robô não conta).
+- *Seções vistas*: cada `<section data-track="nome">` conta quando fica 1,5 s na tela (uma vez por sessão). `investimento` marca “Chegou no investimento”.
+- *Clicou em Aprovar*: abrir a janela de confirmação, mesmo sem enviar.
+- *Confirmou a aprovação*: nome + recado enviados.
+- **Equipe não conta**: quem está logado, ou já entrou no painel naquele navegador (selo `cp_team`, 1 ano), vê a proposta em modo pré-visualização: nada é contado e a aprovação fica desativada.
 
 **Não indexável**: `robots.txt` bloqueia tudo, header `X-Robots-Tag: noindex` em todas as respostas, `<meta name="robots">` no modelo e URLs com slug aleatório de 14 caracteres.
 
@@ -37,7 +39,7 @@ Stack: Next.js 16 (Vercel) + Supabase (Postgres + Auth).
 
 ### 1. Supabase
 1. Crie um projeto em supabase.com (região São Paulo).
-2. **SQL Editor** → cole `supabase/schema.sql` → Run.
+2. **SQL Editor** → cole `supabase/schema.sql` → Run. Depois, na ordem, cada arquivo de `supabase/migrations/`.
 3. **Authentication → Sign In / Providers**: desligue “Allow new users to sign up”.
 4. **Authentication → Users → Add user**: crie o login de cada pessoa da equipe (marque “Auto confirm”).
 5. **Project Settings → API Keys**: copie a URL, a *publishable key* e a *secret key*.

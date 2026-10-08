@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { env, shortHosts } from "@/lib/env";
+import { TEAM_COOKIE, TEAM_COOKIE_OPTIONS } from "@/lib/team-cookie";
 
 export async function proxy(req: NextRequest) {
   const host = (req.headers.get("host") || "").split(":")[0].toLowerCase();
@@ -40,8 +41,11 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(url);
   }
   if (pathname === "/login" && loggedIn) {
-    return NextResponse.redirect(new URL("/admin", req.url));
+    const r = NextResponse.redirect(new URL("/admin", req.url));
+    r.cookies.set(TEAM_COOKIE, "1", TEAM_COOKIE_OPTIONS);
+    return r;
   }
+  if (loggedIn && !req.cookies.get(TEAM_COOKIE)) res.cookies.set(TEAM_COOKIE, "1", TEAM_COOKIE_OPTIONS);
   return res;
 }
 

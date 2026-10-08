@@ -8,14 +8,26 @@ import { ActionButton } from "@/components/action-button";
 import { addProposalLink, deleteProposal, duplicateProposal, resetApproval, setArchived } from "../../actions";
 import { Editor } from "./editor";
 
-type Event = { id: number; type: string; session_id: string | null; user_agent: string | null; country: string | null; city: string | null; created_at: string };
+type Event = { id: number; type: string; detail: string | null; session_id: string | null; user_agent: string | null; country: string | null; city: string | null; created_at: string };
 
-const EVENT_LABEL: Record<string, string> = {
-  view: "Abriu a proposta",
-  link_click: "Clicou no link curto",
-  approve: "Aprovou a proposta",
-  unapprove: "Aprovação desfeita pela equipe",
+const SECTION_LABEL: Record<string, string> = {
+  sobre: "Sobre",
+  entrega: "O que vamos entregar",
+  etapas: "Como funciona",
+  investimento: "Investimento",
+  cloud: "Calma Cloud",
+  aprovar: "Próximos passos",
 };
+
+const eventLabel = (e: Event) =>
+  ({
+    view: "Abriu a proposta",
+    link_click: "Clicou no link curto",
+    section: `Viu “${SECTION_LABEL[e.detail ?? ""] ?? e.detail}”`,
+    approve_open: "Clicou em Aprovar (abriu a confirmação)",
+    approve: "Confirmou a aprovação",
+    unapprove: "Aprovação desfeita pela equipe",
+  })[e.type] ?? e.type;
 
 function device(ua: string | null) {
   if (!ua) return "";
@@ -36,6 +48,14 @@ export default async function ProposalPage({ params }: PageProps<"/admin/propost
   const st = statusOf(p);
   const tplId = isTemplateId(p.template) ? p.template : "calma-v1";
   const data = { ...TEMPLATES[tplId].defaults, ...p.data };
+  const firstClick = (events as Event[] | null)?.filter((e) => e.type === "link_click").at(-1)?.created_at ?? null;
+  const funnel: [string, string | null][] = [
+    ["Clicou no link", firstClick ?? (p.links?.some((l) => l.clicks > 0) ? p.links!.find((l) => l.clicks > 0)!.last_click_at : null)],
+    ["Abriu a proposta", p.first_viewed_at],
+    ["Chegou no investimento", p.reached_pricing_at ?? null],
+    ["Clicou em Aprovar", p.approve_opened_at ?? null],
+    ["Confirmou a aprovação", p.approved_at],
+  ];
   const sessions = new Set((events as Event[] | null)?.filter((e) => e.type === "view").map((e) => e.session_id)).size;
 
   return (
@@ -87,6 +107,18 @@ export default async function ProposalPage({ params }: PageProps<"/admin/propost
           </div>
 
           <div className="card stack">
+            <h2 style={{ fontSize: 22 }}>Jornada do cliente</h2>
+            <ol className="funnel">
+              {funnel.map(([label, at]) => (
+                <li key={label} data-done={at ? "" : undefined}>
+                  <span>{label}</span>
+                  <span className="muted small">{at ? fmtDate(at) : "—"}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div className="card stack">
             <h2 style={{ fontSize: 22 }}>Links</h2>
             {(p.links ?? []).map((l) => (
               <div key={l.code} className="inline" style={{ justifyContent: "space-between" }}>
@@ -110,7 +142,7 @@ export default async function ProposalPage({ params }: PageProps<"/admin/propost
                   <li key={e.id}>
                     <span className="muted small">{fmtDate(e.created_at)}</span>
                     <span>
-                      {EVENT_LABEL[e.type] ?? e.type}
+                      {eventLabel(e)}
                       <span className="muted small" style={{ display: "block" }}>
                         {[device(e.user_agent), [e.city, e.country].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}
                       </span>

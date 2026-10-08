@@ -1,5 +1,7 @@
+import { after } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
-import { getUser } from "@/lib/supabase/server";
+import { isTeam } from "@/lib/team";
+import { isBot } from "@/lib/bots";
 import { renderProposal } from "@/lib/templates/render";
 
 export const dynamic = "force-dynamic";
@@ -17,18 +19,37 @@ const notFound = () =>
     { status: 404, headers: HEADERS },
   );
 
-export async function GET(_req: Request, ctx: RouteContext<"/p/[slug]">) {
+export async function GET(req: Request, ctx: RouteContext<"/p/[slug]">) {
   const { slug } = await ctx.params;
   if (!/^[A-Za-z0-9]{6,64}$/.test(slug)) return notFound();
 
-  const { data: p } = await adminClient()
-    .from("proposals")
-    .select("slug, template, data, archived, approved_at, approved_name")
-    .eq("slug", slug)
-    .maybeSingle();
+  const [{ data: p }, team] = await Promise.all([
+    adminClient()
+      .from("proposals")
+      .select("slug, template, data, archived, approved_at, approved_name")
+      .eq("slug", slug)
+      .maybeSingle(),
+    isTeam(),
+  ]);
+  if (!p || (p.archived && !team)) return notFound();
 
-  const user = await getUser().catch(() => null);
-  if (!p || (p.archived && !user)) return notFound();
+  // Veio pelo link curto (?c=código): conta o clique, exceto equipe e robôs
+  const code = new URL(req.url).searchParams.get("c");
+  const ua = req.headers.get("user-agent");
+  if (code && !team && !isBot(ua)) {
+    after(() =>
+      adminClient().rpc("track_event", {
+        p_slug: slug,
+        p_type: "link_click",
+        p_detail: code.slice(0, 64),
+        p_session: "",
+        p_ua: ua ?? "",
+        p_ref: req.headers.get("referer") ?? "",
+        p_country: req.headers.get("x-vercel-ip-country") ?? "",
+        p_city: decodeURIComponent(req.headers.get("x-vercel-ip-city") ?? ""),
+      }),
+    );
+  }
 
   const html = await renderProposal({
     slug: p.slug,
@@ -36,7 +57,7 @@ export async function GET(_req: Request, ctx: RouteContext<"/p/[slug]">) {
     data: p.data ?? {},
     approvedAt: p.approved_at,
     approvedName: p.approved_name,
-    preview: Boolean(user),
+    preview: team,
   });
   return new Response(html, { headers: HEADERS });
 }
