@@ -7,6 +7,30 @@ import { fmtDate, fmtMoney, publicUrl, shortLink, statusOf, timeAgo, type Propos
 import { Copy } from "@/components/copy";
 import { ProposalInsights, type ProposalEvent } from "@/components/proposal-insights";
 
+const FILTERS = [
+  { key: "", label: "Em aberto" },
+  { key: "aprovadas", label: "Aprovadas" },
+  { key: "todas", label: "Todas" },
+  { key: "arquivadas", label: "Arquivadas" },
+];
+
+const matches = (p: ProposalRow, f: string) => {
+  if (f === "arquivadas") return p.archived;
+  if (p.archived) return false;
+  if (f === "aprovadas") return !!p.approved_at;
+  if (f === "todas") return true;
+  return !p.approved_at;
+};
+
+// Filtro no navegador: troca instantânea, sem ida ao servidor (a URL acompanha: ?f=)
+function setFilterParam(f: string) {
+  const url = new URL(window.location.href);
+  if (f) url.searchParams.set("f", f);
+  else url.searchParams.delete("f");
+  url.searchParams.delete("p");
+  window.history.replaceState(null, "", url);
+}
+
 // ?p=<id> abre a gaveta. Usa history nativo (sem ida ao servidor); o voltar do navegador fecha.
 function setDrawerParam(id: string | null) {
   const url = new URL(window.location.href);
@@ -16,12 +40,29 @@ function setDrawerParam(id: string | null) {
   else window.history.replaceState(null, "", url);
 }
 
-export function ProposalTable({ list, all }: { list: ProposalRow[]; all: ProposalRow[] }) {
-  const openId = useSearchParams().get("p");
+export function ProposalTable({ all }: { all: ProposalRow[] }) {
+  const params = useSearchParams();
+  const openId = params.get("p");
+  const f = params.get("f") ?? "";
   const open = all.find((p) => p.id === openId) ?? null;
+  const list = all.filter((p) => matches(p, f));
 
   return (
     <>
+      <div className="tabs" role="tablist" aria-label="Filtrar propostas">
+        {FILTERS.map((x) => {
+          const n = all.filter((p) => matches(p, x.key)).length;
+          return (
+            <button key={x.key} type="button" role="tab" aria-selected={f === x.key} aria-current={f === x.key ? "page" : undefined} onClick={() => setFilterParam(x.key)}>
+              {x.label} <span className="count">{n}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {list.length === 0 ? (
+        <div className="card muted">Nenhuma proposta aqui.</div>
+      ) : (
       <div className="tablewrap">
         <table className="table">
           <thead>
@@ -70,6 +111,7 @@ export function ProposalTable({ list, all }: { list: ProposalRow[]; all: Proposa
           </tbody>
         </table>
       </div>
+      )}
       {open && <Drawer p={open} onClose={() => setDrawerParam(null)} />}
     </>
   );

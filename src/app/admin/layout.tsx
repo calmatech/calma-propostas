@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getUser } from "@/lib/supabase/server";
@@ -5,12 +6,16 @@ import { signOut } from "@/app/login/actions";
 import { Logo } from "@/components/logo";
 import { Nav } from "./nav";
 import { RefreshOnFocus } from "./refresh-on-focus";
+import { NavProgress } from "./nav-progress";
 
 export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   const user = await getUser();
   if (!user) redirect("/login");
   return (
     <>
+      <Suspense>
+        <NavProgress />
+      </Suspense>
       <header className="top">
         <div className="wrap">
           <Link href="/admin" className="logo" aria-label="Calma propostas, início">

@@ -50,8 +50,8 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--ink); outli
 .hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
 .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
-.tabs a { text-decoration: none; font-size: 14px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
-.tabs a[aria-current] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.tabs a, .tabs button { font: inherit; background: none; cursor: pointer; transition: color .15s, border-color .15s, background .15s; text-decoration: none; font-size: 14px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.tabs a[aria-current], .tabs button[aria-current] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 
 .table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .table th, .table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
@@ -145,3 +145,33 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--ink); outli
 .toggle input:checked::after { transform: translateX(16px); }
 .toggle input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 .toggle > span { display: grid; gap: 2px; }
+
+/* ===== feedback de interação ===== */
+.btn { transition: transform .15s, opacity .15s, background .15s, color .15s, border-color .15s; }
+.btn:hover:not(:disabled) { opacity: .86; }
+.btn.ghost:hover:not(:disabled) { opacity: 1; background: var(--ink); color: var(--paper); }
+.btn.danger:hover:not(:disabled) { opacity: 1; background: var(--err); color: var(--card); }
+.btn:active:not(:disabled), .copy:active, .tabs button:active, .tabs a:active, .drawer-close:active { transform: scale(.97); }
+.tabs a:hover:not([aria-current]), .tabs button:hover:not([aria-current]) { color: var(--ink); border-color: var(--ink); }
+.tabs .count { font-size: 12px; opacity: .6; margin-left: 2px; }
+.top nav a { padding: 6px 10px; margin: 0 -10px; border-radius: 999px; transition: background .15s, color .15s; }
+.top nav a:hover { background: var(--tint); color: var(--ink); }
+.logo { transition: opacity .15s; }
+.logo:hover { opacity: .7; }
+.linkbtn { transition: color .15s; }
+.linkbtn:hover:not(:disabled) { color: var(--ink); }
+.rowbtn:hover { text-decoration: underline; text-underline-offset: 3px; }
+a.muted:hover { color: var(--ink); }
+input, textarea, select { transition: border-color .15s; }
+input:hover:not(:focus):not(:disabled), textarea:hover:not(:focus), select:hover:not(:focus) { border-color: color-mix(in srgb, var(--ink) 35%, var(--line)); }
+.drawer-close { transition: background .15s, transform .15s; }
+.drawer-close:hover { background: var(--tint); }
+.row-item { transition: border-color .15s; }
+.row-item:hover { border-color: color-mix(in srgb, var(--ink) 25%, var(--line)); }
+.toggle:hover input:not(:checked) { background: color-mix(in srgb, var(--ink) 25%, var(--line)); }
+.table tbody tr:not(.clickable):hover td { background: color-mix(in srgb, var(--ink) 4%, var(--card)); }
+button:disabled { cursor: progress; }
+
+/* barra de progresso de navegação */
+.nav-progress { position: fixed; top: 0; left: 0; height: 2px; z-index: 100; background: var(--ink); animation: navp 6s cubic-bezier(.1, .8, .2, 1) forwards; box-shadow: 0 0 8px color-mix(in srgb, var(--ink) 40%, transparent); }
+@keyframes navp { 0% { width: 0; } 10% { width: 35%; } 100% { width: 92%; } }
