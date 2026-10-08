@@ -23,19 +23,28 @@ export async function GET() {
     shortUrl: process.env.NEXT_PUBLIC_SHORT_URL ?? "ausente",
   };
 
+  const t = () => performance.now();
+  const ms: Record<string, number> = {};
   let db = "não testado";
   let auth = "não testado";
   try {
+    const t0 = t();
     const { error } = await adminClient().from("proposals").select("id", { head: true, count: "exact" });
+    ms.db1 = Math.round(t() - t0);
+    const t1 = t();
+    await adminClient().from("proposals").select("id").limit(1);
+    ms.db2 = Math.round(t() - t1);
     db = error ? `erro: ${error.message}` : "ok";
   } catch (e) {
     db = `erro: ${(e as Error).message}`;
   }
   try {
+    const t2 = t();
     const r = await fetch(`${url.replace(/\/$/, "")}/auth/v1/settings`, { headers: { apikey: pub } });
+    ms.auth = Math.round(t() - t2);
     auth = r.ok ? "ok" : `erro HTTP ${r.status}`;
   } catch (e) {
     auth = `erro: ${(e as Error).message}`;
   }
-  return Response.json({ env, db, auth }, { headers: { "cache-control": "no-store" } });
+  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?" }, { headers: { "cache-control": "no-store" } });
 }
