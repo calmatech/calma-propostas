@@ -73,27 +73,28 @@ p{margin:0 0 1em}
 .prog{position:absolute;left:0;bottom:-1px;height:1px;background:var(--ink);width:0}
 
 /* hero */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:120px 0 clamp(40px,6vw,72px);position:relative;overflow:hidden}
-.hero .in{width:100%}
-.hero .tag{display:inline-flex;align-items:center;gap:10px;font-size:14px;border:1px solid var(--line);border-radius:999px;padding:7px 14px 7px 10px;margin-bottom:clamp(28px,4vw,44px);background:var(--card)}
+.hero{min-height:100svh;display:flex;flex-direction:column;padding:calc(68px + clamp(28px,4vw,48px)) 0 clamp(40px,6vw,72px);position:relative;overflow:hidden}
+.hero .in{width:100%;flex:1;display:flex}
+.hero-body{position:relative;flex:1;display:flex;flex-direction:column;align-items:flex-start}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--ink);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.25}}
-.hero h1{font-size:clamp(58px,11.5vw,168px);line-height:.9;letter-spacing:-.03em}
+.hero h1{font-size:clamp(40px,calc(6vw + 28px),132px);line-height:.9;letter-spacing:-.03em}
 .hero h1 .ln{display:block;overflow:hidden;padding-bottom:.06em}
 .hero h1 .w{display:inline-block}
 .js .hero h1 .w{transform:translateY(105%);animation:up 1.1s var(--ease) forwards;animation-delay:var(--d)}
 @keyframes up{to{transform:none}}
 .hero h1 em{font-style:italic}
-.hero-foot{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;flex-wrap:wrap;margin-top:clamp(36px,5vw,56px)}
-.hero-foot p{max-width:28em;margin:0}
-.hero .acts{display:flex;gap:12px;flex-wrap:wrap}
-.hero .vline{position:absolute;left:var(--pad);top:96px;width:1px;background:var(--ink);opacity:.35;height:0}
-.js .hero .vline{animation:grow 1.6s var(--ease) .2s forwards}
-@keyframes grow{to{height:calc(100% - 96px - clamp(40px,6vw,72px) - clamp(220px,32vw,420px))}}
+.hero-sub{max-width:26em;margin:clamp(36px,6vw,72px) 0 0;font-size:clamp(17px,1.4vw,18px);line-height:1.65}
+.hero-cta{margin-top:auto;padding-top:clamp(40px,5vw,56px)}
+/* linha vertical: do título ao botão; no desktop fica na margem, à esquerda do conteúdo */
+.hero .vline{position:absolute;left:-28px;top:0;width:1px;height:100%;background:var(--ink);opacity:.35}
+.js .hero .vline{height:0;animation:grow 1.6s var(--ease) .2s forwards}
+@keyframes grow{to{height:100%}}
 .cue{position:absolute;right:var(--pad);bottom:clamp(40px,6vw,72px);writing-mode:vertical-rl;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:12px}
 .cue::after{content:"";width:1px;height:56px;background:currentColor;animation:cue 2s ease-in-out infinite;transform-origin:top}
 @keyframes cue{0%{transform:scaleY(0)}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
-@media (max-width:760px){.cue{display:none}.hero .vline{display:none}}
+@media (max-width:760px){.hero-body{padding-left:28px}.hero .vline{left:0}.cue{right:calc(var(--pad) + 28px)}}
+@media (max-width:360px){.hero h1{font-size:12.4vw}}
 
 /* faixa */
 .ticker{border-block:1px solid var(--line);overflow:hidden;padding:18px 0;white-space:nowrap}
@@ -230,7 +231,7 @@ p{margin:0 0 1em}
   *,*::before,*::after{animation:none!important;transition:none!important}
   .js .rv,.js .hero h1 .w{opacity:1;transform:none}
   .js .ico .dr{stroke-dashoffset:0}
-  .js .hero .vline{display:none}
+  .js .hero .vline{animation:none;height:100%}
   .manifest .big .wd{opacity:1}
 }
 @media print{
@@ -277,22 +278,16 @@ p{margin:0 0 1em}
 <main id="topo">
 
 <section class="hero">
-  <div class="vline" aria-hidden="true"></div>
-  <div class="in">
-    <span class="tag"><i class="dot"></i><span data-c="projeto"></span></span>
+  <div class="in"><div class="hero-body">
+    <div class="vline" aria-hidden="true"></div>
     <h1 aria-label="">
       <span class="ln"><span class="w" style="--d:.1s">Olá,</span> <span class="w" style="--d:.2s"><span data-c="cliente"></span>,</span></span>
       <span class="ln"><span class="w" style="--d:.35s">temos</span> <span class="w" style="--d:.45s">uma</span></span>
       <span class="ln"><span class="w" style="--d:.55s">proposta</span> <span class="w" style="--d:.65s"><em>pra você.</em></span></span>
     </h1>
-    <div class="hero-foot rv" style="--d:.9s">
-      <p class="muted" data-c="subtitulo"></p>
-      <div class="acts">
-        <a class="btn" href="#proposta">Ver a proposta <span class="ar">↓</span></a>
-        <a class="btn ghost" href="#investimento">Ir para o investimento</a>
-      </div>
-    </div>
-  </div>
+    <p class="hero-sub muted rv" style="--d:.9s" data-c="subtitulo"></p>
+    <div class="hero-cta rv" style="--d:1s"><a class="btn" href="#proposta">Ver a proposta <span class="ar">↓</span></a></div>
+  </div></div>
   <span class="cue" aria-hidden="true">Role</span>
 </section>
 
