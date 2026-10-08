@@ -518,7 +518,6 @@ const io = new IntersectionObserver(es => es.forEach(e => {
   if (!e.isIntersecting) return;
   const el = e.target; el.classList.add("on"); io.unobserve(el);
   el.querySelectorAll("[data-count]").forEach(c => count(c, +c.dataset.count));
-  if (el.classList.contains("total")) count($("#tot"), P.valor, 1600);
 }), {threshold: .15, rootMargin: "0px 0px -6% 0px"});
 $$(".rv").forEach(el => io.observe(el));
 new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add("on")), {threshold: .4}).observe($("#steps"));
