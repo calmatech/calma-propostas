@@ -2,9 +2,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { TEMPLATES } from "@/lib/templates";
 import { fmtMoney, type ProposalRow } from "@/lib/proposals";
-import { SubmitButton } from "@/components/submit-button";
-import { createProposal } from "./actions";
 import { ProposalTable } from "./proposal-table";
+import { NewProposal } from "./new-proposal";
 
 const FILTERS = [
   { key: "", label: "Em aberto" },
@@ -42,19 +41,7 @@ export default async function ProposalsPage({ searchParams }: PageProps<"/admin"
             Acompanhe quem abriu e quem aprovou.
           </p>
         </div>
-        <form action={createProposal} className="inline">
-          <input name="cliente" placeholder="Nome do cliente" required style={{ width: 220 }} />
-          {Object.keys(TEMPLATES).length > 1 && (
-            <select name="template" style={{ width: "auto" }}>
-              {Object.entries(TEMPLATES).map(([id, t]) => (
-                <option key={id} value={id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          )}
-          <SubmitButton pending="Criando…">Nova proposta +</SubmitButton>
-        </form>
+        <NewProposal templates={Object.entries(TEMPLATES).map(([id, t]) => ({ id, name: t.name }))} />
       </div>
 
       <div className="grid3" style={{ marginBottom: 28 }}>

@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import type { CalmaV1 } from "@/lib/templates/calma-v1";
+import { Modal } from "@/components/modal";
 import { saveProposal } from "../../actions";
 
 type Data = Record<string, unknown>;
@@ -9,15 +11,34 @@ type Data = Record<string, unknown>;
 const lines = (v: string) => v.split("\n").map((s) => s.trim()).filter(Boolean);
 
 export function Editor({ id, template, initial }: { id: string; template: string; initial: Data }) {
+  const router = useRouter();
   const [data, setData] = useState<Data>(initial);
   const [saved, setSaved] = useState<Data>(initial);
   const [mode, setMode] = useState<"form" | "json">(template === "calma-v1" ? "form" : "json");
   const [json, setJson] = useState(() => JSON.stringify(initial, null, 2));
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [pending, start] = useTransition();
-  const dirty = JSON.stringify(data) !== JSON.stringify(saved);
+  // saída pendente enquanto o modal "alterações não salvas" está aberto
+  const [leave, setLeave] = useState<null | (() => void)>(null);
 
-  const save = () => {
+  const savedStr = JSON.stringify(saved);
+  const dirty =
+    mode === "json"
+      ? (() => {
+          try {
+            return JSON.stringify(JSON.parse(json)) !== savedStr;
+          } catch {
+            return true;
+          }
+        })()
+      : JSON.stringify(data) !== savedStr;
+
+  const dirtyRef = useRef(dirty);
+  dirtyRef.current = dirty;
+  const bypass = useRef(false);
+
+  // salva e diz se deu certo
+  const save = async () => {
     let payload = data;
     if (mode === "json") {
       try {
@@ -25,38 +46,72 @@ export function Editor({ id, template, initial }: { id: string; template: string
         setData(payload);
       } catch {
         setMsg({ ok: false, text: "JSON inválido." });
-        return;
+        return false;
       }
     }
-    start(async () => {
-      const r = await saveProposal(id, payload);
-      if (r.ok) {
-        setSaved(payload);
-        setMsg({ ok: true, text: "Salvo ✓" });
-      } else setMsg({ ok: false, text: r.error });
-    });
+    const r = await saveProposal(id, payload);
+    if (r.ok) {
+      setSaved(payload);
+      setMsg({ ok: true, text: "Salvo ✓" });
+      return true;
+    }
+    setMsg({ ok: false, text: r.error });
+    return false;
   };
+  const saveNow = () => start(async () => void (await save()));
+  const saveRef = useRef(saveNow);
+  saveRef.current = saveNow;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "s") {
         e.preventDefault();
-        save();
+        saveRef.current();
       }
     };
-    const onLeave = (e: BeforeUnloadEvent) => {
-      if (dirty) e.preventDefault();
+    // recarregar/fechar a aba: aviso nativo do navegador
+    const onUnload = (e: BeforeUnloadEvent) => {
+      if (dirtyRef.current && !bypass.current) e.preventDefault();
+    };
+    // links internos do painel: modal próprio
+    const onClick = (e: MouseEvent) => {
+      if (!dirtyRef.current || bypass.current || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const a = (e.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
+      if (!a || a.target === "_blank" || a.hasAttribute("download")) return;
+      const url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setLeave(() => () => router.push(url.pathname + url.search + url.hash));
+    };
+    // formulários fora do editor (ex.: "Sair" da conta)
+    const onSubmit = (e: SubmitEvent) => {
+      const f = e.target as HTMLFormElement;
+      if (!dirtyRef.current || bypass.current || f.closest("[data-editor]")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setLeave(() => () => f.requestSubmit());
     };
     addEventListener("keydown", onKey);
-    addEventListener("beforeunload", onLeave);
+    addEventListener("beforeunload", onUnload);
+    document.addEventListener("click", onClick, true);
+    document.addEventListener("submit", onSubmit, true);
     return () => {
       removeEventListener("keydown", onKey);
-      removeEventListener("beforeunload", onLeave);
+      removeEventListener("beforeunload", onUnload);
+      document.removeEventListener("click", onClick, true);
+      document.removeEventListener("submit", onSubmit, true);
     };
-  });
+  }, [router]);
+
+  const go = (after: () => void) => {
+    bypass.current = true;
+    setLeave(null);
+    after();
+  };
 
   return (
-    <div>
+    <div data-editor>
       <div className="tabs">
         {template === "calma-v1" && (
           <a href="#" aria-current={mode === "form" ? "page" : undefined} onClick={(e) => { e.preventDefault(); if (mode === "json") { try { setData(JSON.parse(json)); } catch {} } setMode("form"); }}>
@@ -79,10 +134,38 @@ export function Editor({ id, template, initial }: { id: string; template: string
       <div className="savebar">
         {msg && <span className={msg.ok ? "muted small" : "err"}>{msg.text}</span>}
         {dirty && !msg && <span className="muted small">Alterações não salvas</span>}
-        <button className="btn" onClick={save} disabled={pending}>
+        <button className="btn" onClick={saveNow} disabled={pending}>
           {pending ? "Salvando…" : "Salvar"}
         </button>
       </div>
+
+      <Modal open={!!leave} onClose={() => setLeave(null)} title="Sair sem salvar?">
+        <p className="muted" style={{ margin: 0 }}>
+          Você tem alterações nesta proposta que ainda não foram salvas.
+        </p>
+        {msg && !msg.ok && <p className="err" style={{ margin: 0 }}>{msg.text}</p>}
+        <div className="modal-actions">
+          <button type="button" className="linkbtn" onClick={() => setLeave(null)}>
+            Continuar editando
+          </button>
+          <button type="button" className="btn ghost" onClick={() => leave && go(leave)}>
+            Sair sem salvar
+          </button>
+          <button
+            type="button"
+            className="btn"
+            disabled={pending}
+            onClick={() => {
+              const after = leave;
+              start(async () => {
+                if ((await save()) && after) go(after);
+              });
+            }}
+          >
+            {pending ? "Salvando…" : "Salvar e sair"}
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

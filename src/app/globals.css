@@ -118,3 +118,13 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--ink); outli
 @keyframes fadein { from { opacity: 0; } }
 @keyframes slidein { from { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { .drawer, .drawer-backdrop { animation: none; } }
+
+/* modal */
+.modal { border: 0; padding: 0; background: transparent; color: var(--ink); width: min(460px, calc(100vw - 32px)); max-width: none; }
+.modal::backdrop { background: rgba(0, 0, 0, .45); backdrop-filter: blur(3px); }
+.modal[open] { animation: modalin .22s cubic-bezier(.2, .7, .2, 1); }
+.modal-box { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; }
+.modal-box h2 { font-size: 32px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+.modal-actions .linkbtn { margin-right: auto; }
+@keyframes modalin { from { opacity: 0; transform: translateY(8px) scale(.98); } }
