@@ -296,7 +296,7 @@ p{margin:0 0 1em}
 <!-- MANIFESTO -->
 <section class="sec" id="sobre" data-track="sobre">
   <div class="in manifest">
-    <div class="rv"><span class="kicker">Estúdio Calma</span><span class="wm"><svg class="logo" style="height:clamp(52px,7.4vw,96px)" viewBox="42 51 1242 349" role="img" aria-label="Calma"><use href="#calma-logo"/></svg></span></div>
+    <div class="rv"><span class="kicker">Estúdio Calma</span><span class="wm"><svg class="logo" style="height:clamp(52px,7.4vw,96px)" viewBox="0 0 1242 349" role="img" aria-label="Calma"><use href="#calma-logo"/></svg></span></div>
     <p class="big" id="manif">Num mundo que disputa atenção o tempo todo, projetar com calma é criar o que não grita, mas convida. É criar com sensibilidade e intenção, com marcas e com tecnologias, abrindo espaço para o que é humano e vivo.</p>
   </div>
 </section>
@@ -513,7 +513,7 @@ function onScroll() {
   const y = scrollY, H = document.documentElement.scrollHeight - innerHeight;
   bar.classList.toggle("on", y > 10);
   prog.style.width = (H > 0 ? y / H * 100 : 0) + "%";
-  const r = m.getBoundingClientRect(), k = Math.min(1, Math.max(0, (innerHeight * .85 - r.top) / (r.height + innerHeight * .35)));
+  const r = m.getBoundingClientRect(), k = Math.min(1, Math.max(0, (innerHeight - r.top) / (r.height + innerHeight * .25)));
   const lit = RM ? wds.length : Math.round(k * wds.length);
   wds.forEach((w, i) => w.classList.toggle("lit", i < lit));
   let cur = ""; secs.forEach(([id, el]) => { if (el.getBoundingClientRect().top < innerHeight * .4) cur = id; });
