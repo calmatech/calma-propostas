@@ -136,3 +136,12 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--ink); outli
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap; margin-top: 8px; }
 .modal-actions .linkbtn { margin-right: auto; }
 @keyframes modalin { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+
+/* chave liga/desliga */
+.toggle { display: flex; gap: 12px; align-items: flex-start; cursor: pointer; }
+.toggle input { appearance: none; flex: none; width: 40px; height: 24px; padding: 0; margin: 2px 0 0; border-radius: 999px; background: var(--line); border: 0; position: relative; cursor: pointer; transition: background .2s; }
+.toggle input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+.toggle input:checked { background: var(--ok); }
+.toggle input:checked::after { transform: translateX(16px); }
+.toggle input:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.toggle > span { display: grid; gap: 2px; }

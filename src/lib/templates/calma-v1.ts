@@ -19,6 +19,7 @@ export type CalmaV1 = {
   parcelasSemJuros: number;
   parcelasMax: number;
   dominio: number;
+  mostrarCloud: boolean; // false = projeto sem site: esconde a seção Calma Cloud
   // [nome, R$/mês no plano anual, descrição, R$/mês no plano mensal]
   planos: [string, number, string, number?][];
 };
@@ -71,6 +72,7 @@ export const calmaV1Defaults: CalmaV1 = {
   parcelasSemJuros: 2,
   parcelasMax: 12,
   dominio: 40,
+  mostrarCloud: true,
   planos: [
     ["Básica", 90, "Para sites institucionais e páginas simples.", 139],
     ["Pro", 170, "Para sites maiores ou com atualizações frequentes. Inclui estrutura de blog e suporte personalizado.", 210],

@@ -337,7 +337,16 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
         </div>
       </Section>
 
-      <Section title="Planos Calma Cloud">
+      <Section title="Calma Cloud">
+        <label className="toggle">
+          <input type="checkbox" checked={d.mostrarCloud !== false} onChange={(e) => set({ mostrarCloud: e.target.checked })} />
+          <span>
+            <b>Mostrar seção Calma Cloud</b>
+            <span className="hint">Domínio, hospedagem, plataforma e planos. Desligue em projetos sem site.</span>
+          </span>
+        </label>
+        {d.mostrarCloud !== false && (
+        <>
         <p className="hint" style={{ margin: 0 }}>
           Valores por mês. “Anual” é o valor mensal pagando o ano à vista; “Mensal” é cobrando mês a mês. Sem valor mensal, a proposta não mostra o seletor Mensal/Anual.
         </p>
@@ -363,6 +372,8 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
             </>
           )}
         />
+        </>
+        )}
       </Section>
     </div>
   );
