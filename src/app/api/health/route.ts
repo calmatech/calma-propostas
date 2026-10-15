@@ -54,5 +54,13 @@ export async function GET() {
   }
   const { data: pr, error: prErr } = await adminClient().from("proposals").select("reached_pricing_at, approve_opened_at").limit(1);
   const cols = prErr ? `erro: ${prErr.message}` : `ok (${pr?.length ?? 0})`;
-  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?", events, colunasMigracao002: cols }, { headers: { "cache-control": "no-store" } });
+  // teste: o banco aceita um evento "section"? (grava e apaga em seguida)
+  let insertSection = "sem proposta para testar";
+  const { data: one } = await adminClient().from("proposals").select("id").limit(1).maybeSingle();
+  if (one) {
+    const ins = await adminClient().from("proposal_events").insert({ proposal_id: one.id, type: "section", detail: "__diag__", session_id: "__diag__" }).select("id").maybeSingle();
+    insertSection = ins.error ? `erro: ${ins.error.message}` : "ok";
+    if (ins.data) await adminClient().from("proposal_events").delete().eq("id", ins.data.id);
+  }
+  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?", events, colunasMigracao002: cols, insertSection }, { headers: { "cache-control": "no-store" } });
 }
