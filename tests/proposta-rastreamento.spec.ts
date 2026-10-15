@@ -1,0 +1,64 @@
+import { test, expect, type Page } from "@playwright/test";
+
+type Evento = { type: string; detail: string };
+
+// Captura os avisos enviados para /api/track (sem gravar no banco) e qualquer erro de JavaScript da página.
+async function abrir(page: Page, query = "") {
+  const eventos: Evento[] = [];
+  const erros: string[] = [];
+  page.on("pageerror", (e) => erros.push(e.message));
+  await page.route("**/api/track", async (route) => {
+    const body = JSON.parse(route.request().postData() || "{}");
+    eventos.push({ type: body.type, detail: body.detail ?? "" });
+    await route.fulfill({ status: 204 });
+  });
+  await page.goto(`/dev/proposta${query}`);
+  await page.waitForLoadState("load");
+  return { eventos, erros };
+}
+
+// Rola a página aos poucos, como uma pessoa lendo (cada seção precisa de 1,5 s na tela)
+async function rolarAteOFim(page: Page) {
+  const altura = await page.evaluate(() => document.documentElement.scrollHeight);
+  for (let y = 0; y < altura; y += 250) {
+    await page.evaluate(() => window.scrollBy(0, 250));
+    await page.waitForTimeout(600);
+  }
+  await page.waitForTimeout(2500);
+}
+
+const secoes = (ev: Evento[]) => ev.filter((e) => e.type === "section").map((e) => e.detail);
+
+test("registra abertura, todas as seções, o investimento e o clique em Aprovar", async ({ page }) => {
+  const { eventos, erros } = await abrir(page);
+  await rolarAteOFim(page);
+
+  await page.locator("[data-approve]").click();
+  await expect(page.locator("dialog.ap-dlg")).toBeVisible();
+  await page.locator("dialog.ap-dlg [data-close]").click();
+  await page.waitForTimeout(800);
+
+  expect(erros, "a página não pode ter erros de JavaScript").toEqual([]);
+  expect(eventos.filter((e) => e.type === "view")).toHaveLength(1);
+  const esperadas = await page.$$eval("[data-track]", (els) => els.map((el) => el.getAttribute("data-track")));
+  expect(new Set(secoes(eventos))).toEqual(new Set(esperadas));
+  expect(secoes(eventos)).toContain("investimento");
+  expect(eventos.filter((e) => e.type === "approve_open")).toHaveLength(1);
+});
+
+test("sem a seção Calma Cloud: continua rastreando e sem erros", async ({ page }) => {
+  const { eventos, erros } = await abrir(page, "?semCloud=1");
+  await rolarAteOFim(page);
+  expect(erros).toEqual([]);
+  expect(await page.locator("#cloud").count()).toBe(0);
+  expect(secoes(eventos)).toContain("investimento");
+  expect(secoes(eventos)).not.toContain("cloud");
+});
+
+test("visita da equipe (pré-visualização) não envia nada", async ({ page }) => {
+  const { eventos, erros } = await abrir(page, "?equipe=1");
+  await rolarAteOFim(page);
+  expect(erros).toEqual([]);
+  expect(eventos).toEqual([]);
+  await expect(page.locator(".cp-bar")).toBeVisible();
+});

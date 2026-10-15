@@ -55,6 +55,17 @@ Stack: Next.js 16 (Vercel) + Supabase (Postgres + Auth).
 
 Pronto: entre em `propostas.estudiocalma.com.br`, faça login e crie a primeira proposta.
 
+## Testes (Safari)
+
+A maioria dos clientes abre a proposta no Safari (iPhone/Mac). `pnpm test:safari` abre uma proposta de exemplo (`/dev/proposta`, só existe em desenvolvimento) no motor do Safari, simulando iPhone e Mac, rola a página como uma pessoa e confere:
+
+- abertura, todas as seções (incluindo **investimento**) e o clique em **Aprovar** são enviados;
+- sem a seção Calma Cloud continua funcionando;
+- visita da equipe não envia nada;
+- nenhum erro de JavaScript na página.
+
+Rode antes de publicar mudanças em `templates/` ou `public/proposta-runtime.js`. Na primeira vez: `npx playwright install webkit`.
+
 ## Desenvolvimento
 
 ```bash
