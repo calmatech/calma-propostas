@@ -123,7 +123,7 @@
     "</form>";
   document.body.appendChild(dlg);
 
-  var form = dlg.querySelector("form"), err = dlg.querySelector(".ap-err"), send = dlg.querySelector("[data-send]");
+  var form = dlg.querySelector("form"), err = dlg.querySelector(".ap-err"), sendBtn = dlg.querySelector("[data-send]"); // não usar "send": é a função de rastreamento
   dlg.querySelector("[data-close]").addEventListener("click", function () { dlg.close(); });
   dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); });
 
@@ -144,7 +144,7 @@
     if (C.preview) { err.hidden = false; err.textContent = "Pré-visualização: a aprovação fica desativada para a equipe."; return; }
     var name = dlg.querySelector("#ap-name").value.trim(), note = dlg.querySelector("#ap-note").value.trim();
     if (!name) return;
-    send.disabled = true; err.hidden = true;
+    sendBtn.disabled = true; err.hidden = true;
     fetch("/api/approve", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -155,7 +155,7 @@
       .catch(function () {
         err.hidden = false;
         err.textContent = "Não conseguimos registrar agora. Tente de novo em instantes.";
-        send.disabled = false;
+        sendBtn.disabled = false;
       });
   });
 
