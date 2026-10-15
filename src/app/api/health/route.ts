@@ -73,5 +73,6 @@ export async function GET() {
     if (ev?.length) await adminClient().from("proposal_events").delete().in("id", ev.map((e) => e.id));
     if (!pp.reached_pricing_at) await adminClient().from("proposals").update({ reached_pricing_at: null }).eq("id", pp.id);
   }
-  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?", events, colunasMigracao002: cols, insertSection, rpcSection }, { headers: { "cache-control": "no-store" } });
+  const { data: uas } = await adminClient().from("proposal_events").select("type, user_agent, referrer, created_at").in("type", ["view", "link_click"]).order("created_at", { ascending: false }).limit(20);
+  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?", events, colunasMigracao002: cols, insertSection, rpcSection, uas }, { headers: { "cache-control": "no-store" } });
 }
