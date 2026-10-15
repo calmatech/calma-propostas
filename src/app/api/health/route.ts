@@ -46,5 +46,13 @@ export async function GET() {
   } catch (e) {
     auth = `erro: ${(e as Error).message}`;
   }
-  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?" }, { headers: { "cache-control": "no-store" } });
+  // diagnóstico temporário: quantos eventos de cada tipo existem (sem dados pessoais)
+  const events: Record<string, number | string> = {};
+  for (const type of ["view", "link_click", "section", "approve_open", "approve"]) {
+    const { count, error } = await adminClient().from("proposal_events").select("id", { head: true, count: "exact" }).eq("type", type);
+    events[type] = error ? `erro: ${error.message}` : (count ?? 0);
+  }
+  const { data: pr, error: prErr } = await adminClient().from("proposals").select("reached_pricing_at, approve_opened_at").limit(1);
+  const cols = prErr ? `erro: ${prErr.message}` : `ok (${pr?.length ?? 0})`;
+  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?", events, colunasMigracao002: cols }, { headers: { "cache-control": "no-store" } });
 }
