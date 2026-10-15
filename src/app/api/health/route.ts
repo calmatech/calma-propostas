@@ -62,5 +62,16 @@ export async function GET() {
     insertSection = ins.error ? `erro: ${ins.error.message}` : "ok";
     if (ins.data) await adminClient().from("proposal_events").delete().eq("id", ins.data.id);
   }
-  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?", events, colunasMigracao002: cols, insertSection }, { headers: { "cache-control": "no-store" } });
+  // teste: a função track_event registra "section"? (desfaz tudo em seguida)
+  let rpcSection = "sem proposta para testar";
+  const { data: pp } = await adminClient().from("proposals").select("id, slug, reached_pricing_at, archived").eq("archived", false).limit(1).maybeSingle();
+  if (pp) {
+    const r = await adminClient().rpc("track_event", { p_slug: pp.slug, p_type: "section", p_detail: "investimento", p_session: "__diag__", p_ua: "diag", p_ref: "", p_country: "", p_city: "" });
+    const { data: ev } = await adminClient().from("proposal_events").select("id").eq("proposal_id", pp.id).eq("session_id", "__diag__");
+    const { data: after } = await adminClient().from("proposals").select("reached_pricing_at").eq("id", pp.id).single();
+    rpcSection = r.error ? `erro: ${r.error.message}` : `ok · eventos gravados: ${ev?.length ?? 0} · marcou investimento: ${Boolean(after?.reached_pricing_at)}`;
+    if (ev?.length) await adminClient().from("proposal_events").delete().in("id", ev.map((e) => e.id));
+    if (!pp.reached_pricing_at) await adminClient().from("proposals").update({ reached_pricing_at: null }).eq("id", pp.id);
+  }
+  return Response.json({ env, db, auth, ms, region: process.env.VERCEL_REGION ?? "?", events, colunasMigracao002: cols, insertSection, rpcSection }, { headers: { "cache-control": "no-store" } });
 }
