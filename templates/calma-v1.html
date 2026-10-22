@@ -662,7 +662,7 @@ const desc = Math.round((1 - pix / P.valor) * 100);
 const opts = [
   {tab: "Pix", val: fmt(pix), badge: desc > 0 ? `${desc}% de desconto` : "", solid: true,
    txt: "À vista, na assinatura do contrato."},
-  {tab: `${P.parcelasSemJuros}× sem juros`, times: P.parcelasSemJuros, val: fmt(P.valor / P.parcelasSemJuros), badge: "Sem juros",
+  {tab: `${P.parcelasSemJuros}× sem juros`, times: P.parcelasSemJuros, val: fmt(Math.ceil(P.valor / P.parcelasSemJuros)), badge: "Sem juros", /* parcela arredondada para cima: sem centavos */
    txt: `Parcelado no cartão, total de R$ ${fmt(P.valor)}.`},
   {tab: `Até ${P.parcelasMax}×`, val: fmt(P.valor), badge: `Em até ${P.parcelasMax}x`,
    txt: "Parcelado no cartão, com taxas da operadora."}
