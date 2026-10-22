@@ -11,7 +11,7 @@
 <!--__HEAD__-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add("js")</script>
 <style>
 :root{
@@ -77,26 +77,35 @@ p{margin:0 0 1em}
 .hero-body{position:relative;flex:1;display:flex;flex-direction:column;align-items:flex-start}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--ink);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.25}}
-/* cases (opcional): carrossel horizontal, deslizar no celular, setas no desktop */
-.cases-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
-.cases-nav{display:flex;align-items:center;gap:10px}
-.cases-count{font-size:14px;color:var(--muted);margin-right:6px;font-variant-numeric:tabular-nums}
-.cases-count b{color:var(--ink);font-weight:500}
-.cases-nav button{width:48px;height:48px;border-radius:50%;border:1px solid var(--ink);background:transparent;color:var(--ink);font:400 18px var(--sans);cursor:pointer;transition:background .2s,color .2s,opacity .2s}
-.cases-nav button:hover:not(:disabled){background:var(--ink);color:var(--paper)}
-.cases-nav button:disabled{opacity:.25;cursor:default}
-.cases-track{--edge:max(var(--pad),calc((100vw - 1120px) / 2 + var(--pad)));display:flex;gap:clamp(16px,2vw,24px);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--edge);padding:clamp(40px,5vw,56px) var(--edge) 8px;scrollbar-width:none;overscroll-behavior-x:contain}
-.cases-track::-webkit-scrollbar{display:none}
-.case{flex:0 0 min(440px,82vw);scroll-snap-align:start;text-decoration:none;color:inherit;display:block}
-.case figure{margin:0 0 20px;aspect-ratio:4/3;border-radius:24px;overflow:hidden;background:var(--tint);border:1px solid var(--line)}
-.case img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
-a.case:hover img{transform:scale(1.04)}
-.case .cat{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
-.case h3{font-size:clamp(28px,3vw,36px);line-height:1.05;margin-bottom:10px}
-.case p{font-size:15px;color:var(--muted);margin:0 0 14px;max-width:32em}
-.case .go{font:500 14px var(--sans);display:inline-flex;gap:6px;border-bottom:1px solid currentColor;padding-bottom:2px}
-.cases-hint{display:none;font-size:13px;color:var(--muted);margin:14px var(--pad) 0}
-@media (max-width:760px){.cases-nav button{display:none}.cases-hint{display:block}}
+/* cases (opcional): grupos por categoria · nome deitado e fixo na tela · 2 quadros por projeto */
+.cgroups{margin-top:clamp(56px,8vw,112px);display:grid;gap:clamp(88px,11vw,160px)}
+.cgroup{display:grid;grid-template-columns:clamp(100px,14%,190px) minmax(0,1fr);column-gap:clamp(24px,4vw,64px)}
+.cgroup-label{position:relative}
+.cgroup-label span{position:sticky;top:96px;display:block;writing-mode:vertical-rl;transform:rotate(180deg);font:300 clamp(96px,11.5vw,172px)/.78 var(--sans);letter-spacing:-.03em;color:#DCDCD8;text-transform:uppercase;white-space:nowrap}
+.cproj + .cproj{margin-top:clamp(56px,6vw,88px)}
+.cproj h3{font:italic 300 clamp(22px,2.1vw,30px)/1.1 var(--sans);letter-spacing:-.04em;color:var(--muted);margin:0 0 clamp(16px,2vw,26px)}
+.cframes{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,2.4vw,34px)}
+.cframe{position:relative;display:block;width:100%;padding:0;aspect-ratio:5/4;border-radius:14px;overflow:hidden;border:1px solid rgba(0,0,0,.06);background:var(--card);box-shadow:0 14px 29px rgba(0,0,0,.12);color:inherit;text-decoration:none;transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+a.cframe,button.cframe{cursor:pointer}
+button.cframe{cursor:zoom-in}
+a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 36px rgba(0,0,0,.16)}
+.cframe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cframe iframe{position:absolute;left:0;top:0;width:1440px;height:1152px;border:0;transform-origin:0 0;transform:scale(var(--s,.3));pointer-events:none;background:#fff;opacity:0;transition:opacity .6s}
+.cframe iframe.on{opacity:1}
+.cframe .site{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;color:var(--muted)}
+.cmore{margin-top:clamp(36px,5vw,64px);display:inline-flex;align-items:center;gap:14px;font:italic 300 clamp(20px,1.9vw,26px) var(--sans);letter-spacing:-.04em;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:none;transition:color .2s,gap .3s var(--ease)}
+.cmore:hover{color:var(--ink);gap:20px}
+.lightbox{border:0;padding:0;background:transparent;max-width:none;max-height:none;width:100vw;height:100dvh;display:none;place-items:center;cursor:zoom-out}
+.lightbox[open]{display:grid}
+.lightbox::backdrop{background:rgba(20,20,20,.88)}
+.lightbox img{max-width:92vw;max-height:88dvh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lightbox button{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;border:0;background:#f4f4f2;color:#222;font:400 24px/1 var(--sans);cursor:pointer}
+@media (max-width:760px){
+  .cgroup{grid-template-columns:1fr}
+  .cgroup-label{position:sticky;top:68px;z-index:2;margin:0 calc(var(--pad) * -1) 8px;padding:6px var(--pad) 14px;background:linear-gradient(var(--paper) 78%,rgba(247,247,247,0))}
+  .cgroup-label span{position:static;writing-mode:horizontal-tb;transform:none;font-size:clamp(44px,14vw,64px);line-height:.9}
+  .cframes{grid-template-columns:1fr}
+}
 
 .hero h1{font-size:clamp(40px,calc(6vw + 28px),132px);line-height:.9;letter-spacing:-.03em;display:flex;flex-direction:column} /* flex: as margens negativas das linhas somam (não colapsam) */
 /* cada linha recorta a animação de subida; a folga (padding) com margem negativa evita cortar
@@ -426,23 +435,14 @@ a.case:hover img{transform:scale(1.04)}
 </section>
 
 <!-- CASES (opcional) -->
-<section class="sec" id="cases" data-track="cases" style="padding-bottom:clamp(56px,7vw,96px)">
+<section class="sec" id="cases" data-track="cases">
   <div class="in">
-    <div class="cases-head">
-      <div>
-        <span class="kicker rv">Cases</span>
-        <h2 class="h2 rv" data-cases-title></h2>
-      </div>
-      <div class="cases-nav rv">
-        <span class="cases-count" aria-live="polite"><b data-case-i>01</b> / <span data-case-n>01</span></span>
-        <button type="button" data-case-prev aria-label="Case anterior">←</button>
-        <button type="button" data-case-next aria-label="Próximo case">→</button>
-      </div>
-    </div>
+    <span class="kicker rv">Cases</span>
+    <h2 class="h2 rv" data-cases-title></h2>
+    <div class="cgroups" data-cases></div>
   </div>
-  <div class="cases-track" data-cases tabindex="0" aria-label="Cases"></div>
-  <p class="cases-hint">Deslize para ver mais →</p>
 </section>
+<dialog class="lightbox" data-lightbox aria-label="Imagem ampliada"><img alt=""><button type="button" aria-label="Fechar">×</button></dialog>
 
 <!-- ENTREGA -->
 <section class="sec" id="proposta" data-track="entrega">
@@ -590,39 +590,69 @@ $("[data-steps-title]").innerHTML = rich(P.etapasTitulo).replace(/\{n\}/g, (m, i
 $("#steps").style.setProperty("--n", Math.max(1, Math.min(nEtapas, 6)));
 if (!P.validade) $("[data-validade-line]")?.remove();
 
-/* cases: só aparece se ligada no painel e com pelo menos um case */
-const cases = Array.isArray(P.cases) ? P.cases.filter(c => c && (c.titulo || c.imagem)) : [];
-if (P.mostrarCases && cases.length) {
+/* cases (da biblioteca): grupos por categoria, 2 quadros por projeto */
+const lista = Array.isArray(P.casesLista) ? P.casesLista : [];
+if (P.mostrarCases && lista.length) {
   // só links http(s) ou caminhos do próprio site (bloqueia javascript: etc.)
   const safeUrl = u => /^(https?:\/\/|\/(?!\/))/i.test(u || "") ? esc(u) : "";
-  $("[data-cases-title]").innerHTML = rich(P.casesTitulo);
-  const track = $("[data-cases]");
-  track.innerHTML = cases.map((c, i) => {
-    const link = safeUrl(c.link), img = safeUrl(c.imagem);
-    const tag = link ? `a href="${link}" target="_blank" rel="noopener"` : "div";
-    return `<${tag} class="case rv" style="--d:${Math.min(i, 3) * .08}s">` +
-      `<figure>${img ? `<img src="${img}" alt="${esc(c.titulo)}" loading="lazy" decoding="async">` : ""}</figure>` +
-      (c.categoria ? `<span class="cat">${esc(c.categoria)}</span>` : "") +
-      `<h3>${esc(c.titulo)}</h3>` + (c.descricao ? `<p>${esc(c.descricao)}</p>` : "") +
-      (link ? `<span class="go">Ver case <span>↗</span></span>` : "") + `</${link ? "a" : "div"}>`;
-  }).join("");
-  const items = [...track.children], prev = $("[data-case-prev]"), next = $("[data-case-next]");
-  $("[data-case-n]").textContent = String(items.length).padStart(2, "0");
-  const step = () => items[0].getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0);
-  const sync = () => {
-    const i = Math.min(items.length - 1, Math.round(track.scrollLeft / step()));
-    $("[data-case-i]").textContent = String(i + 1).padStart(2, "0");
-    prev.disabled = track.scrollLeft < 8;
-    next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 8;
+  const host = u => { try { return new URL(u).host.replace(/^www\./, ""); } catch (e) { return ""; } };
+  const frame = (f, nome) => {
+    const url = safeUrl(f && f.url);
+    if (!url) return `<div class="cframe"></div>`;
+    if (f.tipo === "link") {
+      const capa = safeUrl(f.capa);
+      const inner = f.embed === false
+        ? (capa ? `<img src="${capa}" alt="${esc(nome)}" loading="lazy" decoding="async">` : `<span class="site">${esc(host(f.url))}</span>`)
+        : `<iframe data-src="${url}" title="${esc(nome)}" tabindex="-1" aria-hidden="true" loading="lazy" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>`;
+      return f.abreLink === false ? `<div class="cframe">${inner}</div>` : `<a class="cframe" href="${url}" target="_blank" rel="noopener" aria-label="${esc(nome)} (abre o site)">${inner}</a>`;
+    }
+    return `<button type="button" class="cframe" data-zoom="${url}" aria-label="Ampliar imagem de ${esc(nome)}"><img src="${url}" alt="${esc(nome)}" loading="lazy" decoding="async"></button>`;
   };
-  prev.addEventListener("click", () => track.scrollBy({left: -step(), behavior: "smooth"}));
-  next.addEventListener("click", () => track.scrollBy({left: step(), behavior: "smooth"}));
-  track.addEventListener("scroll", () => requestAnimationFrame(sync), {passive: true});
-  addEventListener("resize", sync);
-  sync();
-  if (items.length < 2) $(".cases-nav").style.visibility = "hidden";
+  $("[data-cases-title]").innerHTML = rich(P.casesTitulo);
+  $("[data-cases]").innerHTML = (P.casesCategorias || []).map((cat, gi) => {
+    const itens = lista.filter(c => (c.categoria || "").trim() === cat.nome);
+    if (!itens.length) return "";
+    const abertos = Math.max(1, +cat.abertos || itens.length);
+    const modo = cat.verMais || "expandir";
+    const vis = modo === "expandir" ? itens : itens.slice(0, abertos);
+    const projs = vis.map((c, i) => `<article class="cproj rv"${i >= abertos ? " hidden" : ""}><h3>${esc(c.nome)}</h3><div class="cframes">${(c.frames || []).slice(0, 2).map(f => frame(f, c.nome)).join("")}</div></article>`).join("");
+    const link = safeUrl(cat.verMaisLink);
+    const more = modo === "expandir" && itens.length > abertos ? `<button type="button" class="cmore" data-more>Ver mais <span>→</span></button>`
+      : modo === "link" && link ? `<a class="cmore" href="${link}" target="_blank" rel="noopener">Ver mais <span>→</span></a>` : "";
+    return `<div class="cgroup"><div class="cgroup-label" aria-hidden="true"><span>${esc(cat.nome)}</span></div><div>${projs}${more}</div></div>`;
+  }).join("");
+
+  // "Ver mais": revela os projetos ocultos daquela categoria
+  $$("[data-more]").forEach(b => b.addEventListener("click", () => {
+    b.parentElement.querySelectorAll(".cproj[hidden]").forEach(a => { a.hidden = false; a.classList.add("on"); });
+    b.remove(); loadFrames();
+  }));
+
+  // sites ao vivo: escala o site (1440px) para caber no quadro e só carrega perto da tela
+  const fit = el => el.querySelectorAll("iframe").forEach(f => f.style.setProperty("--s", el.clientWidth / 1440));
+  const ro = new ResizeObserver(es => es.forEach(e => fit(e.target)));
+  const lazy = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const f = e.target; lazy.unobserve(f);
+    f.addEventListener("load", () => f.classList.add("on"), {once: true});
+    f.src = f.dataset.src;
+  }), {rootMargin: "400px 0px"});
+  function loadFrames() {
+    $$(".cframe").forEach(el => { if (el.querySelector("iframe")) { ro.observe(el); fit(el); } });
+    $$(".cframe iframe[data-src]:not([src])").forEach(f => { if (!f.closest("[hidden]")) lazy.observe(f); });
+  }
+  loadFrames();
+
+  // imagens: clique amplia
+  const lb = $("[data-lightbox]");
+  $("[data-cases]").addEventListener("click", e => {
+    const z = e.target.closest("[data-zoom]"); if (!z) return;
+    lb.querySelector("img").src = z.dataset.zoom; lb.showModal();
+  });
+  lb.addEventListener("click", () => lb.close());
 } else {
   $("#cases")?.remove();
+  $("[data-lightbox]")?.remove();
 }
 const tk = (P.ticker || []).map(t => `<span>${t}</span>`).join("");
 $("[data-ticker]").innerHTML = tk + tk;

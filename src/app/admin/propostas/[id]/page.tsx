@@ -7,14 +7,17 @@ import { ActionButton } from "@/components/action-button";
 import { ProposalInsights, type ProposalEvent } from "@/components/proposal-insights";
 import { deleteProposal, duplicateProposal, resetApproval, setArchived } from "../../actions";
 import { Editor } from "./editor";
+import { normalizeCase } from "@/lib/cases";
 
 export default async function ProposalPage({ params }: PageProps<"/admin/propostas/[id]">) {
   const { id } = await params;
   const supabase = await createClient();
-  const [{ data: p }, { data: events }] = await Promise.all([
+  const [{ data: p }, { data: events }, { data: casesData }] = await Promise.all([
     supabase.from("proposals").select("*, links(code, clicks, last_click_at)").eq("id", id).maybeSingle<ProposalRow>(),
     supabase.from("proposal_events").select("*").eq("proposal_id", id).order("created_at", { ascending: false }).limit(100),
+    supabase.from("cases").select("id, nome, categoria, frames, updated_at").order("categoria").order("nome"),
   ]);
+  const library = (casesData ?? []).map((c) => normalizeCase(c));
   if (!p) notFound();
 
   const tplId = isTemplateId(p.template) ? p.template : "calma-v1";
@@ -42,7 +45,7 @@ export default async function ProposalPage({ params }: PageProps<"/admin/propost
       </div>
 
       <div className="editor">
-        <Editor id={p.id} template={tplId} initial={data} />
+        <Editor id={p.id} template={tplId} initial={data} library={library} />
 
         <aside className="stack">
           <ProposalInsights p={p} events={(events ?? []) as ProposalEvent[]} />

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:safari": "playwright test"
+    "test:safari": "playwright test",
+    "db:migrate": "node scripts/migrate.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -23,6 +24,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
+    "pg": "^8.23.1",
     "server-only": "^0.0.1",
     "typescript": "^5"
   },

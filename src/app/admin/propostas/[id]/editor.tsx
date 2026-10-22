@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import type { CalmaV1, Case } from "@/lib/templates/calma-v1";
-import { uploadImage } from "../../actions";
+import type { CalmaV1 } from "@/lib/templates/calma-v1";
+import type { CaseItem } from "@/lib/cases";
+import { CasesPicker } from "./cases-picker";
 import { Modal } from "@/components/modal";
 import { saveProposal } from "../../actions";
 
@@ -11,7 +12,7 @@ type Data = Record<string, unknown>;
 
 const lines = (v: string) => v.split("\n").map((s) => s.trim()).filter(Boolean);
 
-export function Editor({ id, template, initial }: { id: string; template: string; initial: Data }) {
+export function Editor({ id, template, initial, library }: { id: string; template: string; initial: Data; library: CaseItem[] }) {
   const router = useRouter();
   const [data, setData] = useState<Data>(initial);
   const [saved, setSaved] = useState<Data>(initial);
@@ -125,7 +126,7 @@ export function Editor({ id, template, initial }: { id: string; template: string
       </div>
 
       {mode === "form" ? (
-        <CalmaForm d={data as unknown as CalmaV1} set={(patch) => { setData((x) => ({ ...x, ...patch })); setMsg(null); }} />
+        <CalmaForm library={library} d={data as unknown as CalmaV1} set={(patch) => { setData((x) => ({ ...x, ...patch })); setMsg(null); }} />
       ) : (
         <div className="card">
           <textarea value={json} onChange={(e) => { setJson(e.target.value); setMsg(null); }} spellCheck={false} style={{ minHeight: 560, font: "13px/1.5 ui-monospace, Menlo, monospace" }} />
@@ -239,7 +240,7 @@ function Rows<T>({ items, onChange, empty, render, title }: { items: T[]; onChan
   );
 }
 
-function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void }) {
+function CalmaForm({ d, set, library }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void; library: CaseItem[] }) {
   const num = (v: string) => (v === "" ? 0 : Number(v.replace(",", ".")));
   return (
     <div>
@@ -271,7 +272,7 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
           <input type="checkbox" checked={!!d.mostrarCases} onChange={(e) => set({ mostrarCases: e.target.checked })} />
           <span>
             <b>Mostrar seção de cases</b>
-            <span className="hint">Aparece depois dos clientes. Precisa de pelo menos um case.</span>
+            <span className="hint">Aparece depois dos clientes. Os cases vêm da biblioteca (menu Cases).</span>
           </span>
         </label>
         {d.mostrarCases && (
@@ -279,24 +280,11 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
             <Field label="Título da seção" hint="Use *asteriscos* para itálico e Enter para quebrar linha.">
               <textarea rows={2} value={d.casesTitulo ?? ""} onChange={(e) => set({ casesTitulo: e.target.value })} />
             </Field>
-            <Rows
-              items={d.cases ?? []}
-              onChange={(cases) => set({ cases })}
-              empty={{ imagem: "", categoria: "", titulo: "", descricao: "", link: "" } as Case}
-              title={(i) => `Case ${String(i + 1).padStart(2, "0")}`}
-              render={(c, up) => (
-                <div className="case-row">
-                  <CaseImage url={c.imagem} onChange={(imagem) => up({ ...c, imagem })} />
-                  <div className="stack" style={{ minWidth: 0 }}>
-                    <div className="grid2">
-                      <input value={c.titulo} placeholder="Título (ex.: Mari Nolasco)" onChange={(e) => up({ ...c, titulo: e.target.value })} />
-                      <input value={c.categoria} placeholder="Categoria (ex.: Identidade + Site)" onChange={(e) => up({ ...c, categoria: e.target.value })} />
-                    </div>
-                    <textarea rows={2} value={c.descricao} placeholder="Descrição curta" onChange={(e) => up({ ...c, descricao: e.target.value })} />
-                    <input value={c.link} placeholder="Link (opcional): https://…" onChange={(e) => up({ ...c, link: e.target.value })} />
-                  </div>
-                </div>
-              )}
+            <CasesPicker
+              library={library}
+              ids={d.casesIds ?? []}
+              categorias={d.casesCategorias ?? []}
+              onChange={(patch) => set(patch)}
             />
           </>
         )}
@@ -421,58 +409,6 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
         </>
         )}
       </Section>
-    </div>
-  );
-}
-
-// Reduz a imagem no navegador (máx. 1600px, WebP) e envia para o Storage
-async function shrink(file: File): Promise<File> {
-  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
-  const bmp = await createImageBitmap(file);
-  const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bmp.width * scale);
-  canvas.height = Math.round(bmp.height * scale);
-  canvas.getContext("2d")!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
-  const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, "image/webp", 0.82));
-  return blob && blob.size < file.size ? new File([blob], "case.webp", { type: "image/webp" }) : file;
-}
-
-function CaseImage({ url, onChange }: { url: string; onChange: (url: string) => void }) {
-  const [busy, setBusy] = useState(false);
-  const [err, setErr] = useState("");
-  const pick = async (file?: File) => {
-    if (!file) return;
-    setBusy(true);
-    setErr("");
-    try {
-      const fd = new FormData();
-      fd.append("file", await shrink(file));
-      const r = await uploadImage(fd);
-      if (r.ok) onChange(r.url);
-      else setErr(r.error);
-    } catch {
-      setErr("Não foi possível enviar a imagem.");
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <div className="case-img">
-      <label className="case-thumb" data-busy={busy ? "" : undefined} title="Clique ou arraste uma imagem"
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => { e.preventDefault(); pick(e.dataTransfer.files[0]); }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        {url ? <img src={url} alt="" /> : <span>{busy ? "Enviando…" : "+ Imagem"}</span>}
-        {busy && url && <span className="case-busy">Enviando…</span>}
-        <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" hidden onChange={(e) => pick(e.target.files?.[0])} />
-      </label>
-      {url && (
-        <button type="button" className="linkbtn small" onClick={() => onChange("")}>
-          Remover imagem
-        </button>
-      )}
-      {err && <span className="err small">{err}</span>}
     </div>
   );
 }

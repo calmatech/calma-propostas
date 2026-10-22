@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { adminClient } from "@/lib/supabase/admin";
+import { normalizeCase, type CaseFrame, type CaseItem } from "@/lib/cases";
+import { checkEmbeddable } from "@/lib/cases-server";
 import { newShortCode, newSlug } from "@/lib/ids";
 import { TEMPLATES, isTemplateId } from "@/lib/templates";
 
@@ -154,4 +156,35 @@ export async function uploadImage(form: FormData): Promise<{ ok: true; url: stri
   }
   if (error) return { ok: false, error: error.message };
   return { ok: true, url: db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl };
+}
+
+// ---------- Biblioteca de cases ----------
+type CaseInput = { id?: string; nome: string; categoria: string; frames: CaseFrame[] };
+
+export async function saveCase(input: CaseInput): Promise<{ ok: true; item: CaseItem } | { ok: false; error: string }> {
+  const { supabase, user } = await session();
+  const nome = input.nome.trim();
+  if (!nome) return { ok: false, error: "Dê um nome ao projeto." };
+  // confere em paralelo se cada link pode ser exibido no quadro
+  const frames = await Promise.all(
+    input.frames.slice(0, 2).map(async (f) => {
+      const url = (f.url || "").trim();
+      if (f.tipo !== "link" || !/^https?:\/\//i.test(url)) return { ...f, url };
+      return { ...f, url, abreLink: f.abreLink !== false, embed: await checkEmbeddable(url) };
+    }),
+  );
+  const row = { nome, categoria: input.categoria.trim(), frames };
+  const q = input.id
+    ? supabase.from("cases").update(row).eq("id", input.id).select("id, nome, categoria, frames, updated_at").single()
+    : supabase.from("cases").insert({ ...row, created_by: user.id }).select("id, nome, categoria, frames, updated_at").single();
+  const { data, error } = await q;
+  if (error) return { ok: false, error: /relation .*cases/i.test(error.message) ? "A tabela de cases ainda não existe: rode a migração 003." : error.message };
+  revalidatePath("/admin/cases");
+  return { ok: true, item: normalizeCase(data) };
+}
+
+export async function deleteCase(id: string) {
+  const { supabase } = await session();
+  await supabase.from("cases").delete().eq("id", id);
+  revalidatePath("/admin/cases");
 }

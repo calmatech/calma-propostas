@@ -2,6 +2,8 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { TEMPLATES, isTemplateId, templateData } from ".";
+import { fetchCasesByIds } from "@/lib/cases-server";
+import { mergeCategorias, type CaseCategoria, type CaseItem } from "@/lib/cases";
 
 type RenderInput = {
   slug: string;
@@ -43,6 +45,13 @@ export async function renderProposal(input: RenderInput) {
   const id = isTemplateId(input.template) ? input.template : "calma-v1";
   const tpl = TEMPLATES[id];
   const data: Record<string, unknown> = templateData(id, input.data);
+  // cases: o conteúdo vem da biblioteca (editar lá atualiza todas as propostas)
+  if (data.mostrarCases && !Array.isArray(data.casesLista)) {
+    const ids = Array.isArray(data.casesIds) ? (data.casesIds as string[]) : [];
+    data.casesLista = await fetchCasesByIds(ids);
+  }
+  if (Array.isArray(data.casesLista))
+    data.casesCategorias = mergeCategorias(data.casesLista as CaseItem[], data.casesCategorias as CaseCategoria[]);
   if (typeof data.validade === "string") data.validade = formatDateLong(data.validade);
 
   const cliente = String(data.cliente ?? "");

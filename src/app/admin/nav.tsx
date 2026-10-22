@@ -7,6 +7,7 @@ export function Nav() {
   const path = usePathname();
   const items = [
     { href: "/admin", label: "Propostas", on: path === "/admin" || path.startsWith("/admin/propostas") },
+    { href: "/admin/cases", label: "Cases", on: path.startsWith("/admin/cases") },
     { href: "/admin/links", label: "Links curtos", on: path.startsWith("/admin/links") },
   ];
   return (

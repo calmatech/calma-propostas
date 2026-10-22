@@ -8,14 +8,19 @@ export async function GET(req: Request) {
   const data: Record<string, unknown> = { cliente: q.get("cliente") ?? "Cliente Teste" };
   if (q.get("semCloud") === "1") data.mostrarCloud = false;
   if (q.get("cases") === "1") {
+    const img = (n: number) => (n % 2 ? "/assets/vivi-tavares.jpg" : "/assets/giovanni-fonseca.jpg");
     data.mostrarCases = true;
-    data.cases = [1, 2, 3, 4].map((i) => ({
-      imagem: i % 2 ? "/assets/vivi-tavares.jpg" : "/assets/giovanni-fonseca.jpg",
-      categoria: "Identidade + Site",
-      titulo: `Case de exemplo ${i}`,
-      descricao: "Uma marca e um site feitos juntos, do primeiro papo ao ar.",
-      link: i < 3 ? "https://estudiocalma.com.br" : "",
-    }));
+    data.casesLista = [
+      { id: "a", nome: "Mari Nolasco", categoria: "Websites", frames: [{ tipo: "link", url: q.get("site") ?? "https://example.com", abreLink: true }, { tipo: "imagem", url: img(1) }] },
+      { id: "b", nome: "Lab Comportamental", categoria: "Websites", frames: [{ tipo: "imagem", url: img(2) }, { tipo: "imagem", url: img(1) }] },
+      { id: "c", nome: "Great Place To Work", categoria: "Apps", frames: [{ tipo: "imagem", url: img(1) }, { tipo: "imagem", url: img(2) }] },
+      { id: "d", nome: "Waterlog", categoria: "Apps", frames: [{ tipo: "imagem", url: img(2) }, { tipo: "imagem", url: img(1) }] },
+      { id: "e", nome: "Ponto App", categoria: "Apps", frames: [{ tipo: "imagem", url: img(1) }, { tipo: "imagem", url: img(2) }] },
+    ];
+    data.casesCategorias = [
+      { nome: "Websites", abertos: 2, verMais: "link", verMaisLink: "https://estudiocalma.com.br" },
+      { nome: "Apps", abertos: 2, verMais: "expandir" },
+    ];
   }
   if (q.get("umaEntrega") === "1") data.grupos = [["Identidade visual", ["Imersão de 2h.", "Logo e elementos de marca.", "Paleta de cores e fontes.", "Templates de slides e posts.", "Entrega dos arquivos."]]];
   if (q.get("etapas")) data.etapas = Array.from({ length: Number(q.get("etapas")) }, (_, i) => [`Etapa ${i + 1}`, "Descrição da etapa."]);

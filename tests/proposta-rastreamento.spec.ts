@@ -55,13 +55,22 @@ test("sem a seção Calma Cloud: continua rastreando e sem erros", async ({ page
   expect(secoes(eventos)).not.toContain("cloud");
 });
 
-test("com cases: seção aparece, navega e é rastreada", async ({ page }) => {
+test("com cases: grupos, site ao vivo, ver mais, ampliar imagem e rastreamento", async ({ page }) => {
   const { eventos, erros } = await abrir(page, "?cases=1&umaEntrega=1&etapas=3");
-  await expect(page.locator(".case")).toHaveCount(4);
+  await expect(page.locator(".cgroup")).toHaveCount(2);
+  await expect(page.locator(".cproj[hidden]")).toHaveCount(1); // Apps: 3 projetos, 2 abertos
   await rolarAteOFim(page);
   expect(erros).toEqual([]);
   expect(secoes(eventos)).toContain("cases");
-  expect(secoes(eventos)).toContain("investimento");
+  // o quadro de link vira um site ao vivo ao chegar perto da tela
+  await expect(page.locator(".cframe iframe").first()).toHaveAttribute("src", /^https?:\/\//);
+  // "Ver mais" (Apps) mostra o projeto oculto; o de Websites é um link
+  await page.locator("[data-more]").click();
+  await expect(page.locator(".cproj[hidden]")).toHaveCount(0);
+  await expect(page.locator("a.cmore")).toHaveAttribute("href", /estudiocalma/);
+  // imagem: clique amplia
+  await page.locator("button.cframe").first().click();
+  await expect(page.locator("dialog.lightbox")).toBeVisible();
 });
 
 test("visita da equipe (pré-visualização) não envia nada", async ({ page }) => {

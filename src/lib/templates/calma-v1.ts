@@ -2,7 +2,7 @@
 // Tuplas mantêm o formato que o HTML do modelo já espera.
 // Textos "rich" aceitam *itálico* e quebra de linha (Enter).
 
-export type Case = { imagem: string; categoria: string; titulo: string; descricao: string; link: string };
+import type { CaseCategoria } from "@/lib/cases";
 
 export type CalmaV1 = {
   cliente: string;
@@ -17,7 +17,8 @@ export type CalmaV1 = {
   naoInclui: string[];
   mostrarCases: boolean;
   casesTitulo: string; // rich
-  cases: Case[];
+  casesIds: string[]; // cases da biblioteca, na ordem escolhida
+  casesCategorias: CaseCategoria[]; // ordem e "Ver mais" de cada categoria
   etapasTitulo: string; // rich; {n} = número de etapas por extenso
   etapas: [string, string][];
   prazo: string;
@@ -72,7 +73,8 @@ export const calmaV1Defaults: CalmaV1 = {
   ],
   mostrarCases: false,
   casesTitulo: "Alguns projetos\n*recentes*",
-  cases: [],
+  casesIds: [],
+  casesCategorias: [],
   etapasTitulo: "{n} passos,\ndo *primeiro papo* ao ar",
   etapas: [
     ["Imersão", "Duas horas juntos para entender desejos e referências."],
