@@ -155,17 +155,18 @@ a.case:hover img{transform:scale(1.04)}
 .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:clamp(72px,10vw,120px);border-top:1px solid var(--night-line);padding-top:clamp(32px,4vw,48px)}
 .nums b{display:block;font:400 clamp(64px,9vw,120px)/1 var(--serif);letter-spacing:-.03em}
 .nums div>span{font-size:15px;color:var(--night-muted)}
-/* logos de clientes: 2 linhas de 5 na largura do conteúdo (celular: 2 colunas); altura individual (--h, em px no desktop) */
-.clients{list-style:none;margin:clamp(72px,9vw,120px) 0 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(48px,6vw,88px) 24px;align-items:center}
-.clients li{display:flex;justify-content:center}
-.clients li:nth-child(5n+1){justify-content:flex-start}
-.clients li:nth-child(5n){justify-content:flex-end}
-.clients img{width:auto;height:clamp(calc(var(--h) * .6px),calc(var(--h) * .1vw),calc(var(--h) * 1px))}
+/* logos de clientes: 3 linhas (3 · 4 · 3) na largura do conteúdo; celular: 2 colunas. Altura individual: --h (px no desktop) */
+.clients{list-style:none;margin:clamp(72px,9vw,120px) 0 0;padding:0;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));row-gap:clamp(48px,7vw,96px);align-items:center}
+.clients li{grid-column:span 4;display:flex;justify-content:center}
+.clients li:nth-child(n+4):nth-child(-n+7){grid-column:span 3}
+.clients li:nth-child(1),.clients li:nth-child(4),.clients li:nth-child(8){justify-content:flex-start}
+.clients li:nth-child(3),.clients li:nth-child(7),.clients li:nth-child(10){justify-content:flex-end}
+.clients img{width:auto;max-width:100%;height:clamp(calc(var(--h) * .6px),calc(var(--h) * .1vw),calc(var(--h) * 1px))}
 @media (max-width:760px){
-  .clients{grid-template-columns:repeat(2,1fr);row-gap:44px}
-  .clients li:nth-child(n){justify-content:flex-start}
-  .clients li:nth-child(2n){justify-content:flex-end}
-  .clients img{height:calc(var(--h) * .72px)}
+  .clients{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:44px}
+  .clients li:nth-child(n):nth-child(n){grid-column:auto;justify-content:flex-start} /* vence as regras de 3·4·3 */
+  .clients li:nth-child(2n):nth-child(n){justify-content:flex-end}
+  .clients img{height:calc(var(--h) * .7px)}
 }
 
 /* entrega */
@@ -391,16 +392,16 @@ a.case:hover img{transform:scale(1.04)}
       <div class="rv" style="--d:.2s"><b>+<span data-count="150">150</span></b><span>projetos entregues</span></div>
     </div>
     <ul class="clients" aria-label="Clientes">
-      <li class="rv" style="--d:0.00s"><img src="/assets/clientes/nu.png" alt="Nubank" width="292" height="161" style="--h:40" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.06s"><img src="/assets/clientes/turbi.png" alt="Turbi" width="476" height="142" style="--h:34" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.12s"><img src="/assets/clientes/sebrae.png" alt="Sebrae" width="491" height="224" style="--h:52" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.18s"><img src="/assets/clientes/loggi.png" alt="Loggi" width="495" height="162" style="--h:37" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.24s"><img src="/assets/clientes/alana.png" alt="Instituto Alana" width="281" height="265" style="--h:62" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.00s"><img src="/assets/clientes/gpts.png" alt="Great Place to Study" width="412" height="293" style="--h:68" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.06s"><img src="/assets/clientes/cba.png" alt="CBA" width="504" height="167" style="--h:40" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.12s"><img src="/assets/clientes/tedx.svg" alt="TEDx" width="686" height="202" style="--h:34" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.18s"><img src="/assets/clientes/anbima.png" alt="Anbima" width="735" height="128" style="--h:30" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.24s"><img src="/assets/clientes/prefeitura-sp.png" alt="Prefeitura de São Paulo" width="660" height="204" style="--h:46" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.00s"><img src="/assets/clientes/nu.png" alt="Nubank" width="292" height="161" style="--h:42" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.06s"><img src="/assets/clientes/turbi.png" alt="Turbi" width="476" height="142" style="--h:38" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.12s"><img src="/assets/clientes/loggi.png" alt="Loggi" width="495" height="162" style="--h:41" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.00s"><img src="/assets/clientes/prefeitura-sp.png" alt="Prefeitura de São Paulo" width="660" height="204" style="--h:50" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.06s"><img src="/assets/clientes/sebrae.png" alt="Sebrae" width="491" height="224" style="--h:56" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.12s"><img src="/assets/clientes/tedx.svg" alt="TEDx" width="686" height="202" style="--h:38" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.18s"><img src="/assets/clientes/alana.png" alt="Instituto Alana" width="281" height="265" style="--h:66" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.00s"><img src="/assets/clientes/cba.png" alt="CBA" width="504" height="167" style="--h:44" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.06s"><img src="/assets/clientes/anbima.png" alt="Anbima" width="735" height="128" style="--h:34" loading="lazy" decoding="async"></li>
+      <li class="rv" style="--d:0.12s"><img src="/assets/clientes/gpts.png" alt="Great Place to Study" width="412" height="293" style="--h:76" loading="lazy" decoding="async"></li>
     </ul>
   </div>
 </section>
