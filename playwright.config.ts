@@ -7,6 +7,8 @@ const PORT = 3000; // reaproveita o "pnpm dev" se já estiver rodando (o Next n�
 export default defineConfig({
   testDir: "tests",
   timeout: 90_000,
+  // 1 nova tentativa: a primeira visita após mudar o código espera o servidor de desenvolvimento recompilar
+  retries: 1,
   reporter: "list",
   use: { baseURL: `http://localhost:${PORT}` },
   projects: [
