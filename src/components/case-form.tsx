@@ -82,7 +82,7 @@ function FrameEditor({ n, frame, onChange }: { n: number; frame: CaseFrame; onCh
       <header>
         <span className="muted small">Quadro {n}</span>
         <span className="seg-mini" role="group" aria-label="Tipo do quadro">
-          <button type="button" aria-pressed={!isLink} onClick={() => onChange({ tipo: "imagem", url: isLink ? "" : frame.url })}>
+          <button type="button" aria-pressed={!isLink} onClick={() => onChange(isLink ? { tipo: "imagem", url: "" } : frame)}>
             Imagem
           </button>
           <button type="button" aria-pressed={isLink} onClick={() => onChange({ tipo: "link", url: isLink ? frame.url : "", abreLink: true })}>
@@ -105,11 +105,11 @@ function FrameEditor({ n, frame, onChange }: { n: number; frame: CaseFrame; onCh
           <div className="hint" style={{ marginTop: 0 }}>
             O site aparece ao vivo no quadro. Capa (opcional): usada se o site não puder ser exibido.
           </div>
-          <ImageField url={frame.capa ?? ""} onChange={(capa) => onChange({ ...frame, capa })} label="+ Capa" />
+          <ImageField url={frame.capa ?? ""} onChange={(capa, thumb) => onChange({ ...frame, capa: thumb || capa })} label="+ Capa" />
         </>
       ) : (
         <>
-          <ImageField url={frame.url} onChange={(url) => onChange({ ...frame, url })} />
+          <ImageField url={frame.thumb || frame.url} onChange={(url, thumb) => onChange({ ...frame, url, thumb })} />
           <div className="hint" style={{ marginTop: 0 }}>
             Na proposta, o clique amplia a imagem.
           </div>

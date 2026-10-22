@@ -2,7 +2,7 @@ import type { CaseFrame } from "@/lib/cases";
 
 // Miniatura de um quadro do case no painel (imagem, capa ou o endereço do site)
 export function CaseThumb({ frame }: { frame: CaseFrame }) {
-  const img = frame.tipo === "imagem" ? frame.url : frame.capa;
+  const img = frame.tipo === "imagem" ? frame.thumb || frame.url : frame.capa;
   let host = "";
   try {
     host = frame.tipo === "link" && frame.url ? new URL(frame.url).host.replace(/^www\./, "") : "";

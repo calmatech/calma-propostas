@@ -629,7 +629,8 @@ if (P.mostrarCases && lista.length) {
         : `<iframe data-src="${url}" title="${esc(nome)}" tabindex="-1" aria-hidden="true" loading="lazy" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>`;
       return f.abreLink === false ? `<div class="cframe">${inner}</div>` : `<a class="cframe" href="${url}" target="_blank" rel="noopener" aria-label="${esc(nome)} (abre o site)">${inner}</a>`;
     }
-    return `<button type="button" class="cframe" data-gi="${gi}" aria-label="Abrir galeria de ${esc(nome)}"><img src="${url}" alt="${esc(nome)}" loading="lazy" decoding="async"></button>`;
+    const src = safeUrl(f.thumb) || url; // quadro: versão média; galeria: original em alta
+    return `<button type="button" class="cframe" data-gi="${gi}" aria-label="Abrir galeria de ${esc(nome)}"><img src="${src}" alt="${esc(nome)}" loading="lazy" decoding="async"></button>`;
   };
   $("[data-cases-title]").innerHTML = rich(P.casesTitulo);
   $("[data-cases]").innerHTML = (P.casesCategorias || []).map((cat, gi) => {

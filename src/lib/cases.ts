@@ -3,6 +3,7 @@
 export type CaseFrame = {
   tipo: "imagem" | "link";
   url: string; // imagem: endereço da imagem · link: endereço do site
+  thumb?: string; // imagem: versão média usada no quadro (a original em alta fica para a galeria)
   capa?: string; // link: imagem mostrada se o site não puder ser exibido no quadro
   abreLink?: boolean; // link: o clique abre o site (padrão: sim)
   embed?: boolean | null; // link: o site permite ser exibido em quadro? (verificado ao salvar)
