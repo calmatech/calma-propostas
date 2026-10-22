@@ -17,6 +17,7 @@ export type ProposalEvent = {
 
 const SECTION_LABEL: Record<string, string> = {
   sobre: "Sobre",
+  cases: "Cases",
   entrega: "O que vamos entregar",
   etapas: "Como funciona",
   investimento: "Investimento",

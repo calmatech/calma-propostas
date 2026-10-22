@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import type { CalmaV1 } from "@/lib/templates/calma-v1";
+import type { CalmaV1, Case } from "@/lib/templates/calma-v1";
+import { uploadImage } from "../../actions";
 import { Modal } from "@/components/modal";
 import { saveProposal } from "../../actions";
 
@@ -251,14 +252,9 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
             <input type="date" value={/^\d{4}-\d{2}-\d{2}$/.test(d.validade) ? d.validade : ""} onChange={(e) => set({ validade: e.target.value })} />
           </Field>
         </div>
-        <div className="grid2">
-          <Field label="Projeto (etiqueta do topo)">
-            <input value={d.projeto} onChange={(e) => set({ projeto: e.target.value })} />
-          </Field>
-          <Field label="Projeto em minúsculas" hint="“Valor total da …”">
-            <input value={d.projetoMin} onChange={(e) => set({ projetoMin: e.target.value })} />
-          </Field>
-        </div>
+        <Field label="Projeto" hint="Aparece no painel e na prévia do link (WhatsApp etc.)">
+          <input value={d.projeto} onChange={(e) => set({ projeto: e.target.value })} />
+        </Field>
         <Field label="Subtítulo do topo">
           <textarea rows={2} value={d.subtitulo} onChange={(e) => set({ subtitulo: e.target.value })} />
         </Field>
@@ -268,6 +264,42 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
         <Field label="Contato (opcional)" hint="Link de WhatsApp ou e-mail mostrado depois que o cliente aprova. Ex.: https://wa.me/5511…">
           <input value={d.contato} onChange={(e) => set({ contato: e.target.value })} placeholder="https://wa.me/55…" />
         </Field>
+      </Section>
+
+      <Section title="Cases">
+        <label className="toggle">
+          <input type="checkbox" checked={!!d.mostrarCases} onChange={(e) => set({ mostrarCases: e.target.checked })} />
+          <span>
+            <b>Mostrar seção de cases</b>
+            <span className="hint">Aparece depois dos clientes. Precisa de pelo menos um case.</span>
+          </span>
+        </label>
+        {d.mostrarCases && (
+          <>
+            <Field label="Título da seção" hint="Use *asteriscos* para itálico e Enter para quebrar linha.">
+              <textarea rows={2} value={d.casesTitulo ?? ""} onChange={(e) => set({ casesTitulo: e.target.value })} />
+            </Field>
+            <Rows
+              items={d.cases ?? []}
+              onChange={(cases) => set({ cases })}
+              empty={{ imagem: "", categoria: "", titulo: "", descricao: "", link: "" } as Case}
+              title={(i) => `Case ${String(i + 1).padStart(2, "0")}`}
+              render={(c, up) => (
+                <div className="case-row">
+                  <CaseImage url={c.imagem} onChange={(imagem) => up({ ...c, imagem })} />
+                  <div className="stack" style={{ minWidth: 0 }}>
+                    <div className="grid2">
+                      <input value={c.titulo} placeholder="Título (ex.: Mari Nolasco)" onChange={(e) => up({ ...c, titulo: e.target.value })} />
+                      <input value={c.categoria} placeholder="Categoria (ex.: Identidade + Site)" onChange={(e) => up({ ...c, categoria: e.target.value })} />
+                    </div>
+                    <textarea rows={2} value={c.descricao} placeholder="Descrição curta" onChange={(e) => up({ ...c, descricao: e.target.value })} />
+                    <input value={c.link} placeholder="Link (opcional): https://…" onChange={(e) => up({ ...c, link: e.target.value })} />
+                  </div>
+                </div>
+              )}
+            />
+          </>
+        )}
       </Section>
 
       <Section title="O que vamos entregar">
@@ -293,6 +325,9 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
       </Section>
 
       <Section title="Etapas e prazo">
+        <Field label="Título da seção" hint={`{n} vira o número de etapas por extenso (hoje: ${d.etapas.length}). Use *asteriscos* para itálico e Enter para quebrar linha.`}>
+          <textarea rows={2} value={d.etapasTitulo ?? ""} onChange={(e) => set({ etapasTitulo: e.target.value })} />
+        </Field>
         <Rows
           items={d.etapas}
           onChange={(etapas) => set({ etapas })}
@@ -313,9 +348,20 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
             <input value={d.inicio} onChange={(e) => set({ inicio: e.target.value })} />
           </Field>
         </div>
+        <div className="grid2">
+          <Field label="Texto do prazo">
+            <textarea rows={3} value={d.prazoNota ?? ""} onChange={(e) => set({ prazoNota: e.target.value })} />
+          </Field>
+          <Field label="Texto do início">
+            <textarea rows={3} value={d.inicioNota ?? ""} onChange={(e) => set({ inicioNota: e.target.value })} />
+          </Field>
+        </div>
       </Section>
 
       <Section title="Investimento">
+        <Field label="Texto abaixo de “Investimento”" hint="Resumo do que está incluído no valor. Enter quebra linha.">
+          <textarea rows={3} value={d.investimentoTexto ?? ""} onChange={(e) => set({ investimentoTexto: e.target.value })} />
+        </Field>
         <div className="grid2">
           <Field label="Valor cheio no cartão (R$)" hint="Usado no 2x sem juros e no parcelado.">
             <input inputMode="decimal" value={String(d.valor)} onChange={(e) => set({ valor: num(e.target.value) })} />
@@ -375,6 +421,58 @@ function CalmaForm({ d, set }: { d: CalmaV1; set: (p: Partial<CalmaV1>) => void 
         </>
         )}
       </Section>
+    </div>
+  );
+}
+
+// Reduz a imagem no navegador (máx. 1600px, WebP) e envia para o Storage
+async function shrink(file: File): Promise<File> {
+  if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+  const bmp = await createImageBitmap(file);
+  const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bmp.width * scale);
+  canvas.height = Math.round(bmp.height * scale);
+  canvas.getContext("2d")!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise<Blob | null>((ok) => canvas.toBlob(ok, "image/webp", 0.82));
+  return blob && blob.size < file.size ? new File([blob], "case.webp", { type: "image/webp" }) : file;
+}
+
+function CaseImage({ url, onChange }: { url: string; onChange: (url: string) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const pick = async (file?: File) => {
+    if (!file) return;
+    setBusy(true);
+    setErr("");
+    try {
+      const fd = new FormData();
+      fd.append("file", await shrink(file));
+      const r = await uploadImage(fd);
+      if (r.ok) onChange(r.url);
+      else setErr(r.error);
+    } catch {
+      setErr("Não foi possível enviar a imagem.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="case-img">
+      <label className="case-thumb" data-busy={busy ? "" : undefined} title="Clique ou arraste uma imagem"
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => { e.preventDefault(); pick(e.dataTransfer.files[0]); }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {url ? <img src={url} alt="" /> : <span>{busy ? "Enviando…" : "+ Imagem"}</span>}
+        {busy && url && <span className="case-busy">Enviando…</span>}
+        <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" hidden onChange={(e) => pick(e.target.files?.[0])} />
+      </label>
+      {url && (
+        <button type="button" className="linkbtn small" onClick={() => onChange("")}>
+          Remover imagem
+        </button>
+      )}
+      {err && <span className="err small">{err}</span>}
     </div>
   );
 }

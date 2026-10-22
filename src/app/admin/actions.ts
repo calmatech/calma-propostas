@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient, getUser } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { newShortCode, newSlug } from "@/lib/ids";
 import { TEMPLATES, isTemplateId } from "@/lib/templates";
 
@@ -128,4 +129,29 @@ export async function deleteLink(code: string) {
   await supabase.from("links").delete().eq("code", code);
   revalidatePath("/admin/links");
   revalidatePath("/admin");
+}
+
+// Imagens dos cases: guardadas no Storage do Supabase (bucket público "propostas").
+// O navegador já reduz a imagem antes do envio (ver editor), então o arquivo chega leve.
+const BUCKET = "propostas";
+const IMAGE_TYPES: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/avif": "avif", "image/gif": "gif" };
+
+export async function uploadImage(form: FormData): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
+  await session();
+  const file = form.get("file");
+  if (!(file instanceof File) || !file.size) return { ok: false, error: "Nenhum arquivo enviado." };
+  const ext = IMAGE_TYPES[file.type];
+  if (!ext) return { ok: false, error: "Use uma imagem JPG, PNG, WebP, AVIF ou GIF." };
+  if (file.size > 3.5 * 1024 * 1024) return { ok: false, error: "Imagem muito grande (máx. 3,5 MB)." };
+
+  const db = adminClient();
+  const path = `cases/${crypto.randomUUID()}.${ext}`;
+  const put = () => db.storage.from(BUCKET).upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
+  let { error } = await put();
+  if (error && /bucket not found/i.test(error.message)) {
+    await db.storage.createBucket(BUCKET, { public: true });
+    ({ error } = await put());
+  }
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, url: db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl };
 }

@@ -1,5 +1,9 @@
 // Campos do modelo "calma-v1" (templates/calma-v1.html).
 // Tuplas mantêm o formato que o HTML do modelo já espera.
+// Textos "rich" aceitam *itálico* e quebra de linha (Enter).
+
+export type Case = { imagem: string; categoria: string; titulo: string; descricao: string; link: string };
+
 export type CalmaV1 = {
   cliente: string;
   projeto: string;
@@ -11,9 +15,16 @@ export type CalmaV1 = {
   ticker: string[];
   grupos: [string, string[]][];
   naoInclui: string[];
+  mostrarCases: boolean;
+  casesTitulo: string; // rich
+  cases: Case[];
+  etapasTitulo: string; // rich; {n} = número de etapas por extenso
   etapas: [string, string][];
   prazo: string;
+  prazoNota: string;
   inicio: string;
+  inicioNota: string;
+  investimentoTexto: string; // texto abaixo de "Investimento"
   valor: number; // valor cheio (cartão)
   valorPix?: number; // à vista no Pix; o selo de desconto é calculado
   parcelasSemJuros: number;
@@ -59,6 +70,10 @@ export const calmaV1Defaults: CalmaV1 = {
     "Mensalidade da Calma Cloud, cobrada a partir da publicação.",
     "Licenças pagas de fontes ou bancos de imagem, se forem necessárias.",
   ],
+  mostrarCases: false,
+  casesTitulo: "Alguns projetos\n*recentes*",
+  cases: [],
+  etapasTitulo: "{n} passos,\ndo *primeiro papo* ao ar",
   etapas: [
     ["Imersão", "Duas horas juntos para entender desejos e referências."],
     ["Identidade", "Logo, elementos, cores e fontes, com rodadas de ajuste."],
@@ -66,7 +81,10 @@ export const calmaV1Defaults: CalmaV1 = {
     ["No ar", "Publicação na Calma Cloud e entrega dos arquivos."],
   ],
   prazo: "45 dias úteis",
-  inicio: "Após o contrato",
+  prazoNota: "Pode variar conforme as aprovações e devoluções de vocês. A gente fica sempre por perto para manter o ritmo. :)",
+  inicio: "No contrato",
+  inicioNota: "Marcamos a imersão assim que o contrato for assinado.",
+  investimentoTexto: "Valor total da identidade visual e do site.",
   valor: 5550,
   valorPix: 4990,
   parcelasSemJuros: 2,
@@ -85,6 +103,11 @@ const OLD_PRO_DESC = "Para sites maiores ou com atualizações frequentes.";
 export function normalizeCalmaV1(data: Record<string, unknown>, raw: Record<string, unknown> = data): Record<string, unknown> {
   // proposta salva antes do campo Pix: Pix = valor do cartão (sem selo de desconto)
   if ("valor" in raw && !("valorPix" in raw)) data = { ...data, valorPix: 0 };
+  // "Após o contrato" virou "No contrato"
+  if (data.inicio === "Após o contrato") data = { ...data, inicio: "No contrato" };
+  // texto do investimento antes era montado com o "projeto em minúsculas"
+  if (!("investimentoTexto" in raw) && typeof raw.projetoMin === "string" && raw.projetoMin.trim())
+    data = { ...data, investimentoTexto: `Valor total da ${raw.projetoMin.trim()}.` };
   if (!Array.isArray(data.planos)) return data;
   const planos = (data.planos as CalmaV1["planos"]).map((pl) => {
     const def = calmaV1Defaults.planos.find((d) => d[0] === pl[0]);

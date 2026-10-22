@@ -55,6 +55,15 @@ test("sem a seção Calma Cloud: continua rastreando e sem erros", async ({ page
   expect(secoes(eventos)).not.toContain("cloud");
 });
 
+test("com cases: seção aparece, navega e é rastreada", async ({ page }) => {
+  const { eventos, erros } = await abrir(page, "?cases=1&umaEntrega=1&etapas=3");
+  await expect(page.locator(".case")).toHaveCount(4);
+  await rolarAteOFim(page);
+  expect(erros).toEqual([]);
+  expect(secoes(eventos)).toContain("cases");
+  expect(secoes(eventos)).toContain("investimento");
+});
+
 test("visita da equipe (pré-visualização) não envia nada", async ({ page }) => {
   const { eventos, erros } = await abrir(page, "?equipe=1");
   await rolarAteOFim(page);

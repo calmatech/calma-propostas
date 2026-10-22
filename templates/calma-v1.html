@@ -15,6 +15,7 @@
 <script>document.documentElement.classList.add("js")</script>
 <style>
 :root{
+  color-scheme:light; /* proposta só em modo claro */
   --paper:#F7F7F7; --ink:#222222; --muted:#6E6E6B; --line:#DCDCD8; --card:#FFFFFF; --tint:#EDEDEA;
   --night:#222222; --night-ink:#F4F4F2; --night-muted:#A6A6A2; --night-line:#3B3B3B; --night-card:#2B2B2B;
   --serif:"Instrument Serif","Times New Roman",Georgia,serif;
@@ -24,8 +25,6 @@
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#181818;--ink:#EDEDEA;--muted:#9D9D99;--line:#333331;--card:#222;--tint:#202020}}
-:root[data-theme="dark"]{--paper:#181818;--ink:#EDEDEA;--muted:#9D9D99;--line:#333331;--card:#222;--tint:#202020}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px);scroll-behavior:smooth}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.65 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -78,6 +77,27 @@ p{margin:0 0 1em}
 .hero-body{position:relative;flex:1;display:flex;flex-direction:column;align-items:flex-start}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--ink);animation:pulse 2.4s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.25}}
+/* cases (opcional): carrossel horizontal, deslizar no celular, setas no desktop */
+.cases-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.cases-nav{display:flex;align-items:center;gap:10px}
+.cases-count{font-size:14px;color:var(--muted);margin-right:6px;font-variant-numeric:tabular-nums}
+.cases-count b{color:var(--ink);font-weight:500}
+.cases-nav button{width:48px;height:48px;border-radius:50%;border:1px solid var(--ink);background:transparent;color:var(--ink);font:400 18px var(--sans);cursor:pointer;transition:background .2s,color .2s,opacity .2s}
+.cases-nav button:hover:not(:disabled){background:var(--ink);color:var(--paper)}
+.cases-nav button:disabled{opacity:.25;cursor:default}
+.cases-track{--edge:max(var(--pad),calc((100vw - 1120px) / 2 + var(--pad)));display:flex;gap:clamp(16px,2vw,24px);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--edge);padding:clamp(40px,5vw,56px) var(--edge) 8px;scrollbar-width:none;overscroll-behavior-x:contain}
+.cases-track::-webkit-scrollbar{display:none}
+.case{flex:0 0 min(440px,82vw);scroll-snap-align:start;text-decoration:none;color:inherit;display:block}
+.case figure{margin:0 0 20px;aspect-ratio:4/3;border-radius:24px;overflow:hidden;background:var(--tint);border:1px solid var(--line)}
+.case img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+a.case:hover img{transform:scale(1.04)}
+.case .cat{display:block;font-size:13px;color:var(--muted);margin-bottom:8px}
+.case h3{font-size:clamp(28px,3vw,36px);line-height:1.05;margin-bottom:10px}
+.case p{font-size:15px;color:var(--muted);margin:0 0 14px;max-width:32em}
+.case .go{font:500 14px var(--sans);display:inline-flex;gap:6px;border-bottom:1px solid currentColor;padding-bottom:2px}
+.cases-hint{display:none;font-size:13px;color:var(--muted);margin:14px var(--pad) 0}
+@media (max-width:760px){.cases-nav button{display:none}.cases-hint{display:block}}
+
 .hero h1{font-size:clamp(40px,calc(6vw + 28px),132px);line-height:.9;letter-spacing:-.03em;display:flex;flex-direction:column} /* flex: as margens negativas das linhas somam (não colapsam) */
 /* cada linha recorta a animação de subida; a folga (padding) com margem negativa evita cortar
    pernas (p, q, g), acentos e o itálico sem mudar o espaçamento entre as linhas */
@@ -147,6 +167,9 @@ p{margin:0 0 1em}
 .card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:clamp(28px,3.4vw,40px);transition:transform .4s var(--ease),border-color .3s}
 .card:hover{transform:translateY(-4px);border-color:var(--ink)}
 .card .ix{font:400 clamp(56px,6vw,76px)/1 var(--serif);display:block;margin-bottom:6px}
+.deliver.single{grid-template-columns:1fr}
+.deliver.single .card ul{columns:2;column-gap:clamp(24px,4vw,56px)}
+.deliver.single .card li{break-inside:avoid}
 .card h3{font-size:clamp(30px,3.2vw,38px);line-height:1.05;margin-bottom:18px}
 .card ul{list-style:none;margin:0;padding:0}
 .card li{padding:11px 0 11px 28px;border-top:1px solid var(--line);position:relative;line-height:1.5;font-size:15px}
@@ -157,7 +180,7 @@ p{margin:0 0 1em}
 .outside li{padding:2px 0}
 
 /* etapas */
-.steps{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(20px,3vw,32px);margin-top:clamp(56px,7vw,80px)}
+.steps{position:relative;display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:clamp(20px,3vw,32px);margin-top:clamp(56px,7vw,80px)}
 .steps .track{position:absolute;left:0;right:0;top:27px;height:1px;background:var(--line)}
 .steps .fill{position:absolute;left:0;top:27px;height:1px;background:var(--ink);width:0;transition:width 1.8s var(--ease)}
 .steps.on .fill{width:100%}
@@ -172,7 +195,7 @@ p{margin:0 0 1em}
 /* investimento */
 .invest{display:grid;grid-template-columns:1fr minmax(0,1.05fr);grid-template-areas:"head card" "head aside";column-gap:clamp(40px,6vw,96px);align-items:start}
 .invest-head{grid-area:head}
-.invest-sub{max-width:24em;margin:24px 0 0}
+.invest-sub{max-width:30em;margin:24px 0 0;white-space:pre-line}
 /* card de pagamento: selo, valor conforme a opção, texto e seletor */
 .paycard{grid-area:card;position:relative;background:var(--card);border:1px solid color-mix(in srgb,var(--ink) 16%,var(--card));border-radius:28px;padding:clamp(48px,5vw,64px) clamp(22px,3vw,40px) clamp(14px,1.6vw,20px)}
 .paycard .badge{position:absolute;top:0;left:clamp(26px,3.4vw,44px);transform:translateY(-50%);font:500 15px/1 var(--sans);padding:11px 16px;border-radius:12px;border:1px solid var(--ink);background:var(--card);color:var(--ink);white-space:nowrap}
@@ -233,6 +256,9 @@ p{margin:0 0 1em}
 .next li:last-child{border-bottom:1px solid var(--line)}
 .next .n{font-size:14px;color:var(--muted)}
 .next b{font:400 clamp(36px,5.4vw,68px)/1 var(--serif)}
+.next .here{display:inline-flex;align-items:center;gap:8px;font:500 12px/1 var(--sans);letter-spacing:0;padding:7px 12px 7px 10px;border-radius:999px;background:var(--ink);color:var(--paper);vertical-align:middle;margin-left:14px;position:relative;top:-.18em;white-space:nowrap}
+[data-approved-slot]:empty{display:none}
+.next .here i{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 2.4s ease-in-out infinite}
 .next span.d{font-size:14px;color:var(--muted);max-width:18em;text-align:right}
 .cta{margin-top:clamp(48px,6vw,72px);display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
 
@@ -249,7 +275,7 @@ p{margin:0 0 1em}
   .manifest,.invest,.deliver,.team,.trio,.plans,.time{grid-template-columns:1fr}
   .invest{grid-template-areas:"head" "card" "aside";row-gap:clamp(36px,8vw,48px)}
   .invest .aside{margin:0}
-  .invest-sub{display:none}
+  .invest-sub{margin-top:16px}
   .steps{grid-template-columns:1fr 1fr;row-gap:40px}.steps .track,.steps .fill{display:none}
   .outside{grid-template-columns:1fr}
 }
@@ -258,6 +284,8 @@ p{margin:0 0 1em}
   .nums{grid-template-columns:1fr;gap:28px}
   .person{grid-template-columns:1fr}.person .ph{width:112px}
   .next li{grid-template-columns:48px 1fr}.next span.d{grid-column:2;text-align:left}
+  .next .here{display:flex;width:max-content;margin:12px 0 0;top:0}
+  .deliver.single .card ul{columns:1}
   .seg button{padding:11px 4px;font-size:13px}
   .total{font-size:clamp(72px,24vw,112px)}
 }
@@ -321,7 +349,7 @@ p{margin:0 0 1em}
       <span class="ln"><span class="w" style="--d:.55s">proposta</span> <span class="w" style="--d:.65s"><em>pra você.</em></span></span>
     </h1>
     <p class="hero-sub muted rv" style="--d:.9s" data-c="subtitulo"></p>
-    <div class="hero-cta rv" style="--d:1s"><a class="btn" href="#proposta">Ver a proposta <span class="ar">↓</span></a></div>
+    <div class="hero-cta rv" style="--d:1s"><a class="btn" href="#sobre">Ver a proposta <span class="ar">↓</span></a></div>
   </div></div>
   <span class="cue" aria-hidden="true">Role</span>
 </section>
@@ -370,6 +398,25 @@ p{margin:0 0 1em}
   </div>
 </section>
 
+<!-- CASES (opcional) -->
+<section class="sec" id="cases" data-track="cases" style="padding-bottom:clamp(56px,7vw,96px)">
+  <div class="in">
+    <div class="cases-head">
+      <div>
+        <span class="kicker rv">Cases</span>
+        <h2 class="h2 rv" data-cases-title></h2>
+      </div>
+      <div class="cases-nav rv">
+        <span class="cases-count" aria-live="polite"><b data-case-i>01</b> / <span data-case-n>01</span></span>
+        <button type="button" data-case-prev aria-label="Case anterior">←</button>
+        <button type="button" data-case-next aria-label="Próximo case">→</button>
+      </div>
+    </div>
+  </div>
+  <div class="cases-track" data-cases tabindex="0" aria-label="Cases"></div>
+  <p class="cases-hint">Deslize para ver mais →</p>
+</section>
+
 <!-- ENTREGA -->
 <section class="sec" id="proposta" data-track="entrega">
   <div class="in">
@@ -388,11 +435,11 @@ p{margin:0 0 1em}
 <section class="sec" style="padding-top:0" data-track="etapas">
   <div class="in">
     <span class="kicker rv">Como funciona</span>
-    <h2 class="h2 rv"><span data-steps-n>Quatro</span> passos,<br>do <em>primeiro papo</em> ao ar</h2>
+    <h2 class="h2 rv" data-steps-title></h2>
     <div class="steps" id="steps"><div class="track"></div><div class="fill"></div></div>
     <div class="time">
-      <div class="rv"><span class="muted small">Prazo estimado</span><b data-c="prazo"></b><p class="small muted" style="margin:0">Pode variar conforme as aprovações e devoluções de vocês. A gente fica sempre por perto para manter o ritmo. :)</p></div>
-      <div class="rv" style="--d:.1s"><span class="muted small">Início</span><b data-c="inicio"></b><p class="small muted" style="margin:0">Marcamos a imersão assim que o contrato for assinado.</p></div>
+      <div class="rv"><span class="muted small">Prazo estimado</span><b data-c="prazo"></b><p class="small muted" style="margin:0" data-c="prazoNota"></p></div>
+      <div class="rv" style="--d:.1s"><span class="muted small">Início</span><b data-c="inicio"></b><p class="small muted" style="margin:0" data-c="inicioNota"></p></div>
     </div>
   </div>
 </section>
@@ -402,7 +449,7 @@ p{margin:0 0 1em}
   <div class="in invest">
     <div class="invest-head">
       <h2 class="h2 rv">Investimento</h2>
-      <p class="invest-sub muted rv">Valor total da <span data-c="projetoMin"></span>.</p>
+      <p class="invest-sub muted rv" data-c="investimentoTexto"></p>
     </div>
     <div class="paycard rv" style="--d:.15s">
       <span class="badge" id="paybadge"></span>
@@ -471,14 +518,13 @@ p{margin:0 0 1em}
     <span class="kicker rv">Próximos passos</span>
     <h2 class="h2 rv">Vamos <em>começar?</em></h2>
     <ol class="next">
-      <li class="rv"><span class="n">01</span><b>Aprovação da proposta</b><span class="d">Você confirma que está tudo certo.</span></li>
+      <li class="rv"><span class="n">01</span><b>Aprovação da proposta <span class="here"><i></i><span>Você está aqui</span></span></b><span class="d">Você confirma que está tudo certo.</span></li>
       <li class="rv" style="--d:.08s"><span class="n">02</span><b>Contrato</b><span class="d">Enviamos para assinatura digital, com os dados de pagamento.</span></li>
       <li class="rv" style="--d:.16s"><span class="n">03</span><b>Kick Off</b><span class="d">Marcamos a imersão e o projeto começa.</span></li>
     </ol>
     <div class="cta rv">
-      <p class="muted" style="margin:0">Proposta válida até <strong style="color:var(--ink)" data-c="validade"></strong>.</p>
+      <p class="muted" style="margin:0" data-validade-line>Proposta válida até <strong style="color:var(--ink)" data-c="validade"></strong>.</p>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <button class="btn ghost" type="button" onclick="window.print()">Salvar em PDF</button>
         <span data-approved-slot></span><button class="btn" type="button" data-approve>Aprovar proposta <span class="ar">→</span></button>
       </div>
     </div>
@@ -508,14 +554,57 @@ if (P.mostrarCloud === false) {
   $("#cloud")?.remove();
   $$('a[href="#cloud"]').forEach(a => (a.closest(".aside") || a).remove());
 }
-const NUM = ["Zero","Um","Dois","Três","Quatro","Cinco","Seis","Sete","Oito","Nove","Dez"];
-$("[data-steps-n]").textContent = NUM[P.etapas.length] || P.etapas.length;
+/* texto curto editável: *itálico* e quebra de linha (Enter) */
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"})[c]);
+const rich = s => esc(s).replace(/\*(.+?)\*/g, "<em>$1</em>").replace(/\n/g, "<br>");
+const NUM = ["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove","dez"];
+const nEtapas = P.etapas.length, nTxt = NUM[nEtapas] || String(nEtapas);
+$("[data-steps-title]").innerHTML = rich(P.etapasTitulo).replace(/\{n\}/g, (m, i) => i === 0 ? nTxt[0].toUpperCase() + nTxt.slice(1) : nTxt);
+$("#steps").style.setProperty("--n", Math.max(1, Math.min(nEtapas, 6)));
+if (!P.validade) $("[data-validade-line]")?.remove();
+
+/* cases: só aparece se ligada no painel e com pelo menos um case */
+const cases = Array.isArray(P.cases) ? P.cases.filter(c => c && (c.titulo || c.imagem)) : [];
+if (P.mostrarCases && cases.length) {
+  // só links http(s) ou caminhos do próprio site (bloqueia javascript: etc.)
+  const safeUrl = u => /^(https?:\/\/|\/(?!\/))/i.test(u || "") ? esc(u) : "";
+  $("[data-cases-title]").innerHTML = rich(P.casesTitulo);
+  const track = $("[data-cases]");
+  track.innerHTML = cases.map((c, i) => {
+    const link = safeUrl(c.link), img = safeUrl(c.imagem);
+    const tag = link ? `a href="${link}" target="_blank" rel="noopener"` : "div";
+    return `<${tag} class="case rv" style="--d:${Math.min(i, 3) * .08}s">` +
+      `<figure>${img ? `<img src="${img}" alt="${esc(c.titulo)}" loading="lazy" decoding="async">` : ""}</figure>` +
+      (c.categoria ? `<span class="cat">${esc(c.categoria)}</span>` : "") +
+      `<h3>${esc(c.titulo)}</h3>` + (c.descricao ? `<p>${esc(c.descricao)}</p>` : "") +
+      (link ? `<span class="go">Ver case <span>↗</span></span>` : "") + `</${link ? "a" : "div"}>`;
+  }).join("");
+  const items = [...track.children], prev = $("[data-case-prev]"), next = $("[data-case-next]");
+  $("[data-case-n]").textContent = String(items.length).padStart(2, "0");
+  const step = () => items[0].getBoundingClientRect().width + parseFloat(getComputedStyle(track).columnGap || 0);
+  const sync = () => {
+    const i = Math.min(items.length - 1, Math.round(track.scrollLeft / step()));
+    $("[data-case-i]").textContent = String(i + 1).padStart(2, "0");
+    prev.disabled = track.scrollLeft < 8;
+    next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 8;
+  };
+  prev.addEventListener("click", () => track.scrollBy({left: -step(), behavior: "smooth"}));
+  next.addEventListener("click", () => track.scrollBy({left: step(), behavior: "smooth"}));
+  track.addEventListener("scroll", () => requestAnimationFrame(sync), {passive: true});
+  addEventListener("resize", sync);
+  sync();
+  if (items.length < 2) $(".cases-nav").style.visibility = "hidden";
+} else {
+  $("#cases")?.remove();
+}
 const tk = (P.ticker || []).map(t => `<span>${t}</span>`).join("");
 $("[data-ticker]").innerHTML = tk + tk;
 $(".hero h1").setAttribute("aria-label", `Olá, ${P.cliente}, temos uma proposta pra você.`);
 
+const single = P.grupos.length === 1;
+$("[data-groups]").classList.toggle("single", single);
 $("[data-groups]").innerHTML = P.grupos.map((g, i) =>
-  `<div class="card rv" style="--d:${i * .12}s"><span class="ix">${String(i + 1).padStart(2, "0")}</span><h3>${g[0]}</h3><ul>${g[1].map(t => `<li>${t}</li>`).join("")}</ul></div>`).join("");
+  `<div class="card rv" style="--d:${i * .12}s">${single ? "" : `<span class="ix">${String(i + 1).padStart(2, "0")}</span>`}<h3>${g[0]}</h3><ul>${g[1].map(t => `<li>${t}</li>`).join("")}</ul></div>`).join("");
 $("[data-list]").innerHTML = P.naoInclui.map(t => `<li>${t}</li>`).join("");
 $("#steps").insertAdjacentHTML("beforeend", P.etapas.map((s, i) =>
   `<div class="step rv" style="--d:${.2 + i * .25}s"><span class="n">${i + 1}</span><h3>${s[0]}</h3><p>${s[1]}</p></div>`).join(""));

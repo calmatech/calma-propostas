@@ -2,7 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 // Testes da página da proposta no motor do Safari (WebKit), que é o navegador da maioria dos clientes.
 // Rodar: pnpm test:safari
-const PORT = 3123;
+const PORT = 3000; // reaproveita o "pnpm dev" se já estiver rodando (o Next não permite dois na mesma pasta)
 
 export default defineConfig({
   testDir: "tests",

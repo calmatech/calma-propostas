@@ -33,35 +33,12 @@
   }
 
   if (C.preview) {
-    // faixa da equipe + seletor de tema (Auto segue o sistema)
-    var st = document.createElement("style");
-    st.textContent =
-      ".cp-bar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:12px;max-width:calc(100vw - 24px);background:#222;color:#f4f4f2;font:500 13px/1 'Plus Jakarta Sans',sans-serif;padding:6px 6px 6px 16px;border-radius:999px;box-shadow:0 6px 24px rgba(0,0,0,.25)}" +
-      ".cp-bar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
-      ".cp-th{display:flex;background:#3a3a3a;border-radius:999px;padding:2px;flex:none}" +
-      ".cp-th button{font:inherit;font-size:12px;color:#bdbdb8;background:none;border:0;border-radius:999px;padding:6px 10px;cursor:pointer}" +
-      ".cp-th button[aria-pressed=true]{background:#f4f4f2;color:#222}" +
-      "@media (max-width:520px){.cp-bar .cp-long{display:none}}" +
-      "@media print{.cp-bar{display:none}}";
-    document.head.appendChild(st);
-
+    // faixa da equipe (a proposta é só em modo claro)
     var b = document.createElement("div");
+    b.textContent = "Pré-visualização da equipe · este acesso não é contado";
+    b.style.cssText = "position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:50;max-width:calc(100vw - 24px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#222;color:#f4f4f2;font:500 13px/1 'Plus Jakarta Sans',sans-serif;padding:11px 16px;border-radius:999px;box-shadow:0 6px 24px rgba(0,0,0,.25)";
     b.className = "cp-bar";
-    b.innerHTML = '<span>Pré-visualização<span class="cp-long"> da equipe · este acesso não é contado</span></span>' +
-      '<div class="cp-th" role="group" aria-label="Tema">' +
-      '<button type="button" data-th="auto">Auto</button><button type="button" data-th="light">Claro</button><button type="button" data-th="dark">Escuro</button></div>';
     document.body.appendChild(b);
-
-    var root = document.documentElement;
-    function theme(t) {
-      if (t === "light" || t === "dark") root.setAttribute("data-theme", t); else root.removeAttribute("data-theme");
-      b.querySelectorAll("[data-th]").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-th") === t)); });
-      try { localStorage.setItem("cp_theme", t); } catch (e) {}
-    }
-    var saved = "auto";
-    try { saved = localStorage.getItem("cp_theme") || "auto"; } catch (e) {}
-    theme(saved);
-    b.addEventListener("click", function (e) { var x = e.target.closest("[data-th]"); if (x) theme(x.getAttribute("data-th")); });
   } else if (document.visibilityState === "visible") {
     send("view");
   } else {
@@ -102,6 +79,9 @@
   function setApproved(at, name) {
     $$("[data-approve]").forEach(function (b) { b.style.display = "none"; });
     $$("[data-cta]").forEach(function (a) { a.innerHTML = "Aprovada ✓"; });
+    // "Você está aqui" passa para o próximo passo
+    var here = document.querySelector(".next .here"), steps = $$(".next li b");
+    if (here && steps[1]) { here.querySelector("span").textContent = "Próximo passo"; steps[1].appendChild(here); }
     $$("[data-approved-slot]").forEach(function (s) {
       s.innerHTML = '<span class="ap-done"><i class="dot"></i>Aprovada' + (name ? " por " + esc(name) : "") + " em " + fmtDate(at) + "</span>";
     });

@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   experimental: {
     // páginas já visitadas reabrem na hora (as ações de salvar invalidam o cache)
     staleTimes: { dynamic: 30, static: 300 },
+    // upload de imagens dos cases (o navegador já reduz antes; a Vercel aceita até 4,5 MB)
+    serverActions: { bodySizeLimit: "4mb" },
   },
   // os HTMLs dos modelos são lidos em runtime
   outputFileTracingIncludes: {
