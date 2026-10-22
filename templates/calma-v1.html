@@ -162,19 +162,25 @@ a.case:hover img{transform:scale(1.04)}
 .proof .clients{list-style:none;margin:0;padding:0}
 .proof .clients li{position:absolute;left:var(--x);top:var(--y);width:var(--w)}
 .proof .clients img{display:block;width:100%;height:auto}
+.mq{display:none}
 @media (max-width:760px){
-  .proof{aspect-ratio:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px;padding:28px 0 0}
+  /* números: um por linha, grandes, legenda à direita */
+  .proof{aspect-ratio:auto;display:block}
   .proof-mid{display:none}
-  .proof .num{position:static;margin:0}
-  .proof .num b{margin-left:0}
-  .proof .num b{font-size:clamp(40px,13vw,56px)}
-  .proof .num>span{font-size:13px;margin-top:8px;white-space:normal;line-height:1.35}
-  .proof .clients{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 16px;align-items:center;margin-top:32px;padding:32px 0;border-top:1px solid var(--night-line)}
-  .proof .clients li{position:static;width:auto;display:flex}
-  .proof .clients li:nth-child(2n){justify-content:flex-end}
-  .proof .clients li:last-child:nth-child(odd){grid-column:1/-1;justify-content:center} /* número ímpar: último centralizado */
-  .proof .clients img{width:auto;height:var(--m);max-width:100%}
+  .proof .num{position:static;margin:0;display:grid;grid-template-columns:auto 1fr;align-items:end;gap:16px;padding:18px 0 20px;border-bottom:1px solid var(--night-line)}
+  .proof .num b{margin-left:0;font-size:clamp(76px,24vw,104px);line-height:.9}
+  .proof .num>span{font-size:15px;line-height:1.35;margin:0 0 .5em;text-align:right;justify-self:end;max-width:9em;white-space:normal}
+  /* logos: duas faixas em loop, de ponta a ponta da tela */
+  .proof .clients{display:none}
+  .mq{display:grid;gap:36px;margin:0 calc(var(--pad) * -1);padding:44px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+  .mq-row{overflow:hidden}
+  .mq-track{display:flex;width:max-content;animation:mq 20s linear infinite}
+  .mq-row.rev .mq-track{animation-direction:reverse;animation-duration:24s}
+  .mq-set{display:flex;align-items:center;gap:44px;padding-right:44px}
+  .mq-set img{display:block;width:auto;flex:none}
 }
+@keyframes mq{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.mq-track{animation:none}}
 
 /* entrega */
 .deliver{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:clamp(48px,6vw,72px)}
@@ -410,6 +416,11 @@ a.case:hover img{transform:scale(1.04)}
         <li class="rv" style="--x:50.229%;--y:81.478%;--w:22.855%;--m:44px;--d:0.06s"><img src="/assets/clientes/unidos.svg" alt="+Unidos" loading="lazy" decoding="async"></li>
         <li class="rv" style="--x:86.771%;--y:81.217%;--w:10.740%;--m:49px;--d:0.12s"><img src="/assets/clientes/gpts.png" alt="Great Place to Study" loading="lazy" decoding="async"></li>
       </ul>
+      <!-- celular: logos em duas faixas rolando (cada uma para um lado) -->
+      <div class="mq" role="list" aria-label="Clientes">
+        <div class="mq-row"><div class="mq-track"><div class="mq-set"><img src="/assets/clientes/nu.png" alt="Nubank" style="height:27px" loading="lazy" decoding="async"><img src="/assets/clientes/turbi.png" alt="Turbi" style="height:24px" loading="lazy" decoding="async"><img src="/assets/clientes/tedx.svg" alt="TEDx" style="height:23px" loading="lazy" decoding="async"><img src="/assets/clientes/loggi.png" alt="Loggi" style="height:26px" loading="lazy" decoding="async"><img src="/assets/clientes/sebrae.png" alt="Sebrae" style="height:36px" loading="lazy" decoding="async"></div><div class="mq-set" aria-hidden="true"><img src="/assets/clientes/nu.png" alt="" style="height:27px" loading="lazy" decoding="async"><img src="/assets/clientes/turbi.png" alt="" style="height:24px" loading="lazy" decoding="async"><img src="/assets/clientes/tedx.svg" alt="" style="height:23px" loading="lazy" decoding="async"><img src="/assets/clientes/loggi.png" alt="" style="height:26px" loading="lazy" decoding="async"><img src="/assets/clientes/sebrae.png" alt="" style="height:36px" loading="lazy" decoding="async"></div></div></div>
+        <div class="mq-row rev"><div class="mq-track"><div class="mq-set"><img src="/assets/clientes/prefeitura-sp.png" alt="Prefeitura de São Paulo" style="height:32px" loading="lazy" decoding="async"><img src="/assets/clientes/anbima.png" alt="Anbima" style="height:21px" loading="lazy" decoding="async"><img src="/assets/clientes/cba.png" alt="CBA" style="height:28px" loading="lazy" decoding="async"><img src="/assets/clientes/alana.png" alt="Instituto Alana" style="height:44px" loading="lazy" decoding="async"><img src="/assets/clientes/unidos.svg" alt="+Unidos" style="height:42px" loading="lazy" decoding="async"><img src="/assets/clientes/gpts.png" alt="Great Place to Study" style="height:48px" loading="lazy" decoding="async"></div><div class="mq-set" aria-hidden="true"><img src="/assets/clientes/prefeitura-sp.png" alt="" style="height:32px" loading="lazy" decoding="async"><img src="/assets/clientes/anbima.png" alt="" style="height:21px" loading="lazy" decoding="async"><img src="/assets/clientes/cba.png" alt="" style="height:28px" loading="lazy" decoding="async"><img src="/assets/clientes/alana.png" alt="" style="height:44px" loading="lazy" decoding="async"><img src="/assets/clientes/unidos.svg" alt="" style="height:42px" loading="lazy" decoding="async"><img src="/assets/clientes/gpts.png" alt="" style="height:48px" loading="lazy" decoding="async"></div></div></div>
+      </div>
     </div>
   </div>
 </section>
