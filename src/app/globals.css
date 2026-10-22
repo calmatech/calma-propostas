@@ -206,3 +206,10 @@ button:disabled { cursor: progress; }
 .case-mini[data-warn] { outline: 1px dashed var(--warn); }
 .case-pick { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); }
 .case-pick .case-card-frames { gap: 4px; }
+.extras { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.extra { position: relative; aspect-ratio: 5 / 4; border-radius: 8px; overflow: hidden; background: var(--tint); }
+.extra img { width: 100%; height: 100%; object-fit: cover; }
+.extra-actions { position: absolute; inset: auto 4px 4px; display: flex; justify-content: space-between; opacity: 0; transition: opacity .15s; }
+.extra:hover .extra-actions, .extra:focus-within .extra-actions { opacity: 1; }
+.extra-actions button { width: 24px; height: 24px; border-radius: 50%; border: 0; background: var(--card); color: var(--ink); font-size: 13px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.case-more { font-size: 11px; color: var(--muted); }

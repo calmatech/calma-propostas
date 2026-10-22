@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient, getUser } from "@/lib/supabase/server";
 import { adminClient } from "@/lib/supabase/admin";
-import { normalizeCase, type CaseFrame, type CaseItem } from "@/lib/cases";
+import { MAX_FRAMES, normalizeCase, type CaseFrame, type CaseItem } from "@/lib/cases";
 import { checkEmbeddable } from "@/lib/cases-server";
 import { newShortCode, newSlug } from "@/lib/ids";
 import { TEMPLATES, isTemplateId } from "@/lib/templates";
@@ -167,7 +167,7 @@ export async function saveCase(input: CaseInput): Promise<{ ok: true; item: Case
   if (!nome) return { ok: false, error: "Dê um nome ao projeto." };
   // confere em paralelo se cada link pode ser exibido no quadro
   const frames = await Promise.all(
-    input.frames.slice(0, 2).map(async (f) => {
+    input.frames.slice(0, MAX_FRAMES).filter((f, i) => i < 2 || (f.url || "").trim()).map(async (f) => {
       const url = (f.url || "").trim();
       if (f.tipo !== "link" || !/^https?:\/\//i.test(url)) return { ...f, url };
       return { ...f, url, abreLink: f.abreLink !== false, embed: await checkEmbeddable(url) };

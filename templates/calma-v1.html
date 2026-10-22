@@ -95,11 +95,29 @@ a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 
 .cframe .site{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;color:var(--muted)}
 .cmore{margin-top:clamp(36px,5vw,64px);display:inline-flex;align-items:center;gap:14px;font:italic 300 clamp(20px,1.9vw,26px) var(--sans);letter-spacing:-.04em;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:none;transition:color .2s,gap .3s var(--ease)}
 .cmore:hover{color:var(--ink);gap:20px}
-.lightbox{border:0;padding:0;background:transparent;max-width:none;max-height:none;width:100vw;height:100dvh;display:none;place-items:center;cursor:zoom-out}
-.lightbox[open]{display:grid}
-.lightbox::backdrop{background:rgba(20,20,20,.88)}
-.lightbox img{max-width:92vw;max-height:88dvh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.lightbox button{position:fixed;top:16px;right:16px;width:44px;height:44px;border-radius:50%;border:0;background:#f4f4f2;color:#222;font:400 24px/1 var(--sans);cursor:pointer}
+/* galeria do projeto: sobreposta à proposta (que não rola enquanto está aberta) */
+.g-lock,.g-lock body{overflow:hidden}
+.g-lock body{position:fixed;left:0;right:0;width:100%}
+.gallery{border:0;padding:0;margin:0;width:100vw;height:100dvh;max-width:none;max-height:none;background:#161616;color:#f4f4f2;overflow:hidden}
+.gallery::backdrop{background:#161616}
+.gallery :focus-visible{outline:2px solid rgba(255,255,255,.6);outline-offset:2px}
+.g-stage:focus{outline:none}
+.gallery[open]{display:grid;grid-template-rows:auto minmax(0,1fr)}
+.g-top{display:flex;align-items:center;gap:16px;padding:14px var(--pad)}
+.g-title{flex:1;min-width:0;font:italic 300 22px var(--sans);letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-count{font-size:14px;color:#a6a6a2;font-variant-numeric:tabular-nums}
+.g-close{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:transparent;color:#f4f4f2;font:300 24px/1 var(--sans);cursor:pointer;transition:background .2s}
+.g-close:hover{background:rgba(255,255,255,.12)}
+.g-stage{position:relative;overflow:hidden;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.g-stage.drag{cursor:grabbing}
+.g-track{display:flex;height:100%;will-change:transform}
+.g-slide{flex:0 0 100%;min-width:0;display:grid;place-items:center;padding:0 var(--pad) clamp(20px,4vh,40px)}
+.g-slide img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;-webkit-user-drag:none;pointer-events:none}
+.g-nav{position:fixed;top:50%;transform:translateY(-50%);width:52px;height:52px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(34,34,34,.55);color:#f4f4f2;font:400 20px var(--sans);cursor:pointer;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background .2s,opacity .2s}
+.g-nav:hover{background:rgba(255,255,255,.16)}
+.g-nav:disabled{opacity:0;pointer-events:none}
+.g-prev{left:max(16px,calc(var(--pad) - 36px))}.g-next{right:max(16px,calc(var(--pad) - 36px))}
+@media (max-width:760px){.g-nav{display:none}}
 @media (max-width:760px){
   .cgroup{grid-template-columns:1fr}
   .cgroup-label{position:sticky;top:68px;z-index:2;margin:0 calc(var(--pad) * -1) 8px;padding:6px var(--pad) 14px;background:linear-gradient(var(--paper) 78%,rgba(247,247,247,0))}
@@ -442,7 +460,12 @@ a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 
     <div class="cgroups" data-cases></div>
   </div>
 </section>
-<dialog class="lightbox" data-lightbox aria-label="Imagem ampliada"><img alt=""><button type="button" aria-label="Fechar">×</button></dialog>
+<dialog class="gallery" data-gallery aria-label="Galeria do projeto">
+  <div class="g-top"><span class="g-title"></span><span class="g-count" aria-live="polite"></span><button type="button" class="g-close" data-g-close aria-label="Fechar galeria">×</button></div>
+  <div class="g-stage" tabindex="-1" autofocus><div class="g-track"></div></div>
+  <button type="button" class="g-nav g-prev" data-g-prev aria-label="Foto anterior">←</button>
+  <button type="button" class="g-nav g-next" data-g-next aria-label="Próxima foto">→</button>
+</dialog>
 
 <!-- ENTREGA -->
 <section class="sec" id="proposta" data-track="entrega">
@@ -596,7 +619,7 @@ if (P.mostrarCases && lista.length) {
   // só links http(s) ou caminhos do próprio site (bloqueia javascript: etc.)
   const safeUrl = u => /^(https?:\/\/|\/(?!\/))/i.test(u || "") ? esc(u) : "";
   const host = u => { try { return new URL(u).host.replace(/^www\./, ""); } catch (e) { return ""; } };
-  const frame = (f, nome) => {
+  const frame = (f, nome, gi) => {
     const url = safeUrl(f && f.url);
     if (!url) return `<div class="cframe"></div>`;
     if (f.tipo === "link") {
@@ -606,7 +629,7 @@ if (P.mostrarCases && lista.length) {
         : `<iframe data-src="${url}" title="${esc(nome)}" tabindex="-1" aria-hidden="true" loading="lazy" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>`;
       return f.abreLink === false ? `<div class="cframe">${inner}</div>` : `<a class="cframe" href="${url}" target="_blank" rel="noopener" aria-label="${esc(nome)} (abre o site)">${inner}</a>`;
     }
-    return `<button type="button" class="cframe" data-zoom="${url}" aria-label="Ampliar imagem de ${esc(nome)}"><img src="${url}" alt="${esc(nome)}" loading="lazy" decoding="async"></button>`;
+    return `<button type="button" class="cframe" data-gi="${gi}" aria-label="Abrir galeria de ${esc(nome)}"><img src="${url}" alt="${esc(nome)}" loading="lazy" decoding="async"></button>`;
   };
   $("[data-cases-title]").innerHTML = rich(P.casesTitulo);
   $("[data-cases]").innerHTML = (P.casesCategorias || []).map((cat, gi) => {
@@ -615,7 +638,12 @@ if (P.mostrarCases && lista.length) {
     const abertos = Math.max(1, +cat.abertos || itens.length);
     const modo = cat.verMais || "expandir";
     const vis = modo === "expandir" ? itens : itens.slice(0, abertos);
-    const projs = vis.map((c, i) => `<article class="cproj rv"${i >= abertos ? " hidden" : ""}><h3>${esc(c.nome)}</h3><div class="cframes">${(c.frames || []).slice(0, 2).map(f => frame(f, c.nome)).join("")}</div></article>`).join("");
+    const projs = vis.map((c, i) => {
+      // galeria: todas as imagens do projeto (os 2 quadros + as fotos extras)
+      const gal = (c.frames || []).filter(f => f && f.tipo !== "link" && safeUrl(f.url)).map(f => f.url);
+      const quadros = (c.frames || []).slice(0, 2).map(f => frame(f, c.nome, gal.indexOf(f && f.url))).join("");
+      return `<article class="cproj rv"${i >= abertos ? " hidden" : ""} data-gal="${esc(JSON.stringify(gal))}" data-nome="${esc(c.nome)}"><h3>${esc(c.nome)}</h3><div class="cframes">${quadros}</div></article>`;
+    }).join("");
     const link = safeUrl(cat.verMaisLink);
     const more = modo === "expandir" && itens.length > abertos ? `<button type="button" class="cmore" data-more>Ver mais <span>→</span></button>`
       : modo === "link" && link ? `<a class="cmore" href="${link}" target="_blank" rel="noopener">Ver mais <span>→</span></a>` : "";
@@ -643,16 +671,62 @@ if (P.mostrarCases && lista.length) {
   }
   loadFrames();
 
-  // imagens: clique amplia
-  const lb = $("[data-lightbox]");
-  $("[data-cases]").addEventListener("click", e => {
-    const z = e.target.closest("[data-zoom]"); if (!z) return;
-    lb.querySelector("img").src = z.dataset.zoom; lb.showModal();
+  // galeria: abre na foto clicada; setas, teclado e arrastar; a proposta não rola por trás
+  const G = $("[data-gallery]"), track = G.querySelector(".g-track"), stage = G.querySelector(".g-stage");
+  const gPrev = G.querySelector("[data-g-prev]"), gNext = G.querySelector("[data-g-next]");
+  let gi = 0, gn = 0, lockY = 0;
+  const go = (i, anim = true) => {
+    gi = Math.max(0, Math.min(gn - 1, i));
+    track.style.transition = anim ? "transform .45s var(--ease)" : "none";
+    track.style.transform = `translateX(${-gi * 100}%)`;
+    G.querySelector(".g-count").textContent = gn > 1 ? `${gi + 1} / ${gn}` : "";
+    gPrev.disabled = gi === 0; gNext.disabled = gi >= gn - 1;
+  };
+  const openGallery = (list, nome, i) => {
+    track.innerHTML = list.map(u => `<div class="g-slide"><img src="${esc(u)}" alt="${esc(nome)}" decoding="async" draggable="false"></div>`).join("");
+    gn = list.length; G.querySelector(".g-title").textContent = nome;
+    lockY = scrollY; document.body.style.top = -lockY + "px"; document.documentElement.classList.add("g-lock");
+    G.showModal(); go(i, false);
+  };
+  G.addEventListener("close", () => {
+    document.documentElement.classList.remove("g-lock"); document.body.style.top = "";
+    scrollTo({top: lockY, behavior: "instant"});
   });
-  lb.addEventListener("click", () => lb.close());
+  $("[data-cases]").addEventListener("click", e => {
+    const b = e.target.closest("[data-gi]"); if (!b) return;
+    const art = b.closest("[data-gal]");
+    openGallery(JSON.parse(art.dataset.gal || "[]"), art.dataset.nome || "", Math.max(0, +b.dataset.gi || 0));
+  });
+  G.querySelector("[data-g-close]").addEventListener("click", () => G.close());
+  gPrev.addEventListener("click", () => go(gi - 1));
+  gNext.addEventListener("click", () => go(gi + 1));
+  G.addEventListener("keydown", e => { if (e.key === "ArrowLeft") go(gi - 1); if (e.key === "ArrowRight") go(gi + 1); });
+  // arrastar (celular e mouse); um toque sem arrastar fora da foto fecha
+  let x0 = null, dx = 0;
+  stage.addEventListener("pointerdown", e => { x0 = e.clientX; dx = 0; stage.setPointerCapture(e.pointerId); stage.classList.add("drag"); track.style.transition = "none"; });
+  stage.addEventListener("pointermove", e => {
+    if (x0 === null) return;
+    dx = e.clientX - x0;
+    const edge = (gi === 0 && dx > 0) || (gi === gn - 1 && dx < 0) ? .35 : 1; // resistência nas pontas
+    track.style.transform = `translateX(calc(${-gi * 100}% + ${dx * edge}px))`;
+  });
+  const end = e => {
+    if (x0 === null) return;
+    stage.classList.remove("drag"); x0 = null;
+    if (Math.abs(dx) > 50) go(gi + (dx < 0 ? 1 : -1));
+    else {
+      go(gi);
+      // toque simples fora da foto fecha
+      const img = track.children[gi]?.querySelector("img"), r = img && img.getBoundingClientRect();
+      const fora = !r || e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+      if (Math.abs(dx) < 6 && e.type === "pointerup" && fora) G.close();
+    }
+  };
+  stage.addEventListener("pointerup", end);
+  stage.addEventListener("pointercancel", end);
 } else {
   $("#cases")?.remove();
-  $("[data-lightbox]")?.remove();
+  $("[data-gallery]")?.remove();
 }
 const tk = (P.ticker || []).map(t => `<span>${t}</span>`).join("");
 $("[data-ticker]").innerHTML = tk + tk;

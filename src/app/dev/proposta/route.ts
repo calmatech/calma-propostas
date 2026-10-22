@@ -12,7 +12,7 @@ export async function GET(req: Request) {
     data.mostrarCases = true;
     data.casesLista = [
       { id: "a", nome: "Mari Nolasco", categoria: "Websites", frames: [{ tipo: "link", url: q.get("site") ?? "https://example.com", abreLink: true }, { tipo: "imagem", url: img(1) }] },
-      { id: "b", nome: "Lab Comportamental", categoria: "Websites", frames: [{ tipo: "imagem", url: img(2) }, { tipo: "imagem", url: img(1) }] },
+      { id: "b", nome: "Lab Comportamental", categoria: "Websites", frames: [{ tipo: "imagem", url: img(2) }, { tipo: "imagem", url: img(1) }, { tipo: "imagem", url: "/assets/clientes/tedx.svg" }, { tipo: "imagem", url: "/assets/clientes/unidos.svg" }] },
       { id: "c", nome: "Great Place To Work", categoria: "Apps", frames: [{ tipo: "imagem", url: img(1) }, { tipo: "imagem", url: img(2) }] },
       { id: "d", nome: "Waterlog", categoria: "Apps", frames: [{ tipo: "imagem", url: img(2) }, { tipo: "imagem", url: img(1) }] },
       { id: "e", nome: "Ponto App", categoria: "Apps", frames: [{ tipo: "imagem", url: img(1) }, { tipo: "imagem", url: img(2) }] },

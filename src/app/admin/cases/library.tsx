@@ -37,11 +37,12 @@ export function CasesLibrary({ initial }: { initial: CaseItem[] }) {
               <div key={c.id} className="case-card">
                 <button type="button" className="case-card-main" onClick={() => setEditing(c)}>
                   <div className="case-card-frames">
-                    {c.frames.map((f, i) => (
+                    {c.frames.slice(0, 2).map((f, i) => (
                       <CaseThumb key={i} frame={f} />
                     ))}
                   </div>
                   <b>{c.nome}</b>
+                  {c.frames.length > 2 && <span className="case-more">+{c.frames.length - 2} fotos na galeria</span>}
                 </button>
                 <div className="inline" style={{ justifyContent: "space-between" }}>
                   <button type="button" className="linkbtn small" onClick={() => setEditing(c)}>

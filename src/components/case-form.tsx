@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ImageField } from "@/components/image-field";
+import { ImageField, shrink } from "@/components/image-field";
 import { emptyFrame, type CaseFrame, type CaseItem } from "@/lib/cases";
-import { saveCase } from "@/app/admin/actions";
+import { saveCase, uploadImage } from "@/app/admin/actions";
 
 // Formulário de um case da biblioteca (usado na página Cases e no editor da proposta).
 export function CaseForm({
@@ -54,10 +54,14 @@ export function CaseForm({
         </label>
       </div>
       <div className="grid2">
-        {frames.map((f, i) => (
+        {frames.slice(0, 2).map((f, i) => (
           <FrameEditor key={i} n={i + 1} frame={f} onChange={(v) => setFrame(i, v)} />
         ))}
       </div>
+      <Extras
+        urls={frames.slice(2).map((f) => f.url)}
+        onChange={(urls) => setFrames((x) => [...x.slice(0, 2), ...urls.map((url) => ({ tipo: "imagem" as const, url }))])}
+      />
       {err && <p className="err" style={{ margin: 0 }}>{err}</p>}
       <div className="modal-actions">
         <button type="button" className="linkbtn" onClick={onCancel}>
@@ -111,6 +115,66 @@ function FrameEditor({ n, frame, onChange }: { n: number; frame: CaseFrame; onCh
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+// Fotos extras: não aparecem nos quadros, só na galeria do projeto
+function Extras({ urls, onChange }: { urls: string[]; onChange: (urls: string[]) => void }) {
+  const [busy, setBusy] = useState(0);
+  const [err, setErr] = useState("");
+  const add = async (files: FileList | null) => {
+    if (!files?.length) return;
+    setErr("");
+    const list = [...files];
+    setBusy(list.length);
+    const out: string[] = [];
+    for (const file of list) {
+      try {
+        const fd = new FormData();
+        fd.append("file", await shrink(file));
+        const r = await uploadImage(fd);
+        if (r.ok) out.push(r.url);
+        else setErr(r.error);
+      } catch {
+        setErr("Não foi possível enviar uma das imagens.");
+      }
+      setBusy((n) => n - 1);
+    }
+    onChange([...urls, ...out]);
+  };
+  const move = (i: number, d: number) => {
+    const j = i + d;
+    if (j < 0 || j >= urls.length) return;
+    const n = [...urls];
+    [n[i], n[j]] = [n[j], n[i]];
+    onChange(n);
+  };
+  return (
+    <div className="row-item">
+      <header>
+        <span className="muted small">Fotos extras · só na galeria (o clique num quadro de imagem abre todas)</span>
+        <label className="btn ghost sm" style={{ cursor: busy ? "progress" : "pointer" }}>
+          {busy ? `Enviando ${busy}…` : "+ Adicionar fotos"}
+          <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif,image/gif" hidden disabled={!!busy} onChange={(e) => { add(e.target.files); e.target.value = ""; }} />
+        </label>
+      </header>
+      {urls.length > 0 && (
+        <div className="extras">
+          {urls.map((u, i) => (
+            <div key={u + i} className="extra">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={u} alt="" />
+              <span className="extra-actions">
+                <button type="button" onClick={() => move(i, -1)} aria-label="Mover para a esquerda">←</button>
+                <button type="button" onClick={() => move(i, 1)} aria-label="Mover para a direita">→</button>
+                <button type="button" onClick={() => onChange(urls.filter((_, k) => k !== i))} aria-label="Remover">×</button>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+      {err && <span className="err small">{err}</span>}
     </div>
   );
 }

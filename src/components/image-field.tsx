@@ -4,7 +4,7 @@ import { useState } from "react";
 import { uploadImage } from "@/app/admin/actions";
 
 // Reduz a imagem no navegador (máx. 1600px, WebP) e envia para o Storage
-async function shrink(file: File): Promise<File> {
+export async function shrink(file: File): Promise<File> {
   if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
   const bmp = await createImageBitmap(file);
   const scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));

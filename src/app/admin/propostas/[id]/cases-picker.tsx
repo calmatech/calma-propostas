@@ -51,13 +51,16 @@ export function CasesPicker({
           {selected.map((c, i) => (
             <div key={c.id} className="case-pick">
               <div className="case-card-frames">
-                {c.frames.map((f, k) => (
+                {c.frames.slice(0, 2).map((f, k) => (
                   <CaseThumb key={k} frame={f} />
                 ))}
               </div>
               <div style={{ minWidth: 0 }}>
                 <b>{c.nome}</b>
-                <div className="muted small">{c.categoria || "Sem categoria"}</div>
+                <div className="muted small">
+                  {c.categoria || "Sem categoria"}
+                  {c.frames.length > 2 && ` · +${c.frames.length - 2} fotos`}
+                </div>
               </div>
               <span className="inline" style={{ gap: 8 }}>
                 <button type="button" className="linkbtn small" onClick={() => setIds(move(ids, ids.indexOf(c.id), -1))} aria-label="Subir">↑</button>

@@ -24,10 +24,13 @@ export type CaseCategoria = {
   verMaisLink?: string;
 };
 
+export const MAX_FRAMES = 24;
+
 export const emptyFrame = (): CaseFrame => ({ tipo: "imagem", url: "" });
 
 export function normalizeCase(c: Partial<CaseItem> & { id: string }): CaseItem {
-  const frames = Array.isArray(c.frames) ? c.frames.slice(0, 2) : [];
+  // os 2 primeiros aparecem na proposta; os demais só na galeria
+  const frames = Array.isArray(c.frames) ? c.frames.slice(0, MAX_FRAMES) : [];
   while (frames.length < 2) frames.push(emptyFrame());
   return { id: c.id, nome: c.nome ?? "", categoria: c.categoria ?? "", frames, updated_at: c.updated_at };
 }
