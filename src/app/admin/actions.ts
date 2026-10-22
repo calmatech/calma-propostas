@@ -179,12 +179,12 @@ export async function saveCase(input: CaseInput): Promise<{ ok: true; item: Case
     : supabase.from("cases").insert({ ...row, created_by: user.id }).select("id, nome, categoria, frames, updated_at").single();
   const { data, error } = await q;
   if (error) return { ok: false, error: /relation .*cases/i.test(error.message) ? "A tabela de cases ainda não existe: rode a migração 003." : error.message };
-  revalidatePath("/admin/cases");
+  revalidatePath("/admin", "layout"); // todas as páginas do painel (editor das propostas inclusive)
   return { ok: true, item: normalizeCase(data) };
 }
 
 export async function deleteCase(id: string) {
   const { supabase } = await session();
   await supabase.from("cases").delete().eq("id", id);
-  revalidatePath("/admin/cases");
+  revalidatePath("/admin", "layout"); // todas as páginas do painel (editor das propostas inclusive)
 }

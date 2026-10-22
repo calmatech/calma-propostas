@@ -213,3 +213,8 @@ button:disabled { cursor: progress; }
 .extra:hover .extra-actions, .extra:focus-within .extra-actions { opacity: 1; }
 .extra-actions button { width: 24px; height: 24px; border-radius: 50%; border: 0; background: var(--card); color: var(--ink); font-size: 13px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
 .case-more { font-size: 11px; color: var(--muted); }
+.case-group { display: grid; gap: 14px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.case-group > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.case-group h3 { font: 400 26px/1 var(--serif); margin: 0; }
+.case-group .case-pick { background: var(--card); }
+.linkbtn:disabled { opacity: .3; cursor: default; }
