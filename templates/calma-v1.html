@@ -377,6 +377,7 @@ a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 
     <a class="wm" href="#topo" aria-label="Calma, voltar ao início"><svg class="logo" viewBox="0 0 1242 349" aria-hidden="true"><use href="#calma-logo"/></svg></a>
     <nav aria-label="Seções da proposta">
       <a class="l" href="#sobre">Sobre</a>
+      <a class="l" href="#cases">Cases</a>
       <a class="l" href="#proposta">Proposta</a>
       <a class="l" href="#investimento">Investimento</a>
       <a class="l" href="#cloud">Calma Cloud</a>
@@ -729,6 +730,7 @@ if (P.mostrarCases && lista.length) {
   stage.addEventListener("pointercancel", end);
 } else {
   $("#cases")?.remove();
+  $('.bar a[href="#cases"]')?.remove();
   $("[data-gallery]")?.remove();
 }
 const tk = (P.ticker || []).map(t => `<span>${t}</span>`).join("");
@@ -818,7 +820,7 @@ new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.clas
 
 /* rolagem: barra, progresso, manifesto, menu ativo */
 const bar = $("#bar"), prog = $("#prog");
-const secs = ["sobre", "proposta", "investimento", "cloud"].map(id => [id, document.getElementById(id)]).filter(([, el]) => el);
+const secs = ["sobre", "cases", "proposta", "investimento", "cloud"].map(id => [id, document.getElementById(id)]).filter(([, el]) => el);
 function onScroll() {
   const y = scrollY, H = document.documentElement.scrollHeight - innerHeight;
   bar.classList.toggle("on", y > 10);
