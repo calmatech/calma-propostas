@@ -131,8 +131,8 @@ a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 
 @media (max-width:760px){
   /* celular: nome deitado à direita, por trás dos projetos, fixo na tela até o fim da categoria */
   .cgroup{grid-template-columns:1fr;position:relative}
-  .cgroup-label{position:absolute;top:0;right:0;bottom:0;z-index:0;pointer-events:none}
-  .cgroup-label span{position:sticky;top:96px;font-size:clamp(56px,17vw,76px)}
+  .cgroup-label{position:absolute;top:0;right:8px;bottom:0;z-index:0;pointer-events:none}
+  .cgroup-label span{position:sticky;top:96px;font-size:clamp(56px,17vw,76px);line-height:1.25} /* caixa do tamanho real das letras: não vaza pela borda */
   .cgroup > div:last-child{position:relative;z-index:1;padding-top:calc(var(--lh,140px) + 20px)} /* --lh: comprimento do nome (medido) */
   .cframes{grid-template-columns:1fr}
   .cframes .cframe:nth-child(n+2){display:none} /* celular: só o 1º quadro; a galeria tem todas */
