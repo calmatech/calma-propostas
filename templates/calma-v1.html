@@ -81,6 +81,7 @@ p{margin:0 0 1em}
 .cgroups{margin-top:clamp(56px,8vw,112px);display:grid;gap:clamp(88px,11vw,160px)}
 .cgroup{display:grid;grid-template-columns:clamp(100px,14%,190px) minmax(0,1fr);column-gap:clamp(24px,4vw,64px)}
 .cgroup-label{position:relative}
+.cgroup-label b{font-weight:inherit}
 .cgroup-label span{position:sticky;top:96px;display:block;writing-mode:vertical-rl;transform:rotate(180deg);font:300 clamp(96px,11.5vw,172px)/.78 var(--sans);letter-spacing:-.03em;color:#DCDCD8;text-transform:uppercase;white-space:nowrap}
 .cproj + .cproj{margin-top:clamp(56px,6vw,88px)}
 .cproj h3{font:italic 300 clamp(22px,2.1vw,30px)/1.1 var(--sans);letter-spacing:-.04em;color:var(--muted);margin:0 0 clamp(16px,2vw,26px)}
@@ -129,8 +130,9 @@ a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 
 @media (max-width:760px){
   /* celular: nome deitado à direita, por trás dos projetos, fixo na tela até o fim da categoria */
   .cgroup{grid-template-columns:1fr;position:relative}
-  .cgroup-label{position:absolute;top:0;right:8px;bottom:0;z-index:0;pointer-events:none}
-  .cgroup-label span{position:sticky;top:96px;font-size:clamp(56px,17vw,76px);line-height:1.25} /* caixa do tamanho real das letras: não vaza pela borda */
+  .cgroup-label{position:absolute;top:0;right:4px;bottom:0;width:1.05em;font-size:clamp(56px,17vw,76px);z-index:0;pointer-events:none}
+  .cgroup-label span{position:sticky;top:96px;writing-mode:horizontal-tb;transform:none;width:1.05em;height:var(--lw,4em);font-size:inherit;line-height:1;overflow:visible}
+  .cgroup-label span b{position:absolute;left:0;top:100%;transform-origin:0 0;transform:rotate(-90deg);white-space:nowrap;line-height:1.05}
   .cgroup > div:last-child{position:relative;z-index:1;padding-top:calc(var(--lh,140px) + 20px)} /* --lh: comprimento do nome (medido) */
   .cframes{grid-template-columns:1fr}
   .cframes .cframe:nth-child(n+2){display:none} /* celular: só o 1º quadro; a galeria tem todas */
@@ -660,11 +662,15 @@ if (P.mostrarCases && lista.length) {
     const link = safeUrl(cat.verMaisLink);
     const more = modo === "expandir" && itens.length > abertos ? `<button type="button" class="cmore" data-more>Ver mais <span>→</span></button>`
       : modo === "link" && link ? `<a class="cmore" href="${link}" target="_blank" rel="noopener">Ver mais <span>→</span></a>` : "";
-    return `<div class="cgroup"><div class="cgroup-label" aria-hidden="true"><span>${esc(cat.nome)}</span></div><div>${projs}${more}</div></div>`;
+    return `<div class="cgroup"><div class="cgroup-label" aria-hidden="true"><span><b>${esc(cat.nome)}</b></span></div><div>${projs}${more}</div></div>`;
   }).join("");
 
   // celular: o espaço acima do 1º projeto acompanha o comprimento do nome da categoria
-  const medeNomes = () => $$(".cgroup").forEach(g => g.style.setProperty("--lh", g.querySelector(".cgroup-label span").offsetHeight + "px"));
+  const medeNomes = () => $$(".cgroup").forEach(g => {
+    const span = g.querySelector(".cgroup-label span"), b = span.querySelector("b");
+    span.style.setProperty("--lw", b.offsetWidth + "px");          // celular: comprimento do nome
+    g.style.setProperty("--lh", span.offsetHeight + "px");          // espaço acima do 1º projeto
+  });
   medeNomes(); addEventListener("resize", medeNomes);
   document.fonts?.ready.then(medeNomes);
 
