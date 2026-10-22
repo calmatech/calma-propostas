@@ -90,7 +90,7 @@ a.cframe,button.cframe{cursor:pointer}
 button.cframe{cursor:zoom-in}
 a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 36px rgba(0,0,0,.16)}
 .cframe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.cframe iframe{position:absolute;left:0;top:0;width:1440px;height:1152px;border:0;transform-origin:0 0;transform:scale(var(--s,.3));pointer-events:none;background:#fff;opacity:0;transition:opacity .6s}
+.cframe iframe{position:absolute;left:0;top:0;width:1464px;height:1152px;border:0;transform-origin:0 0;transform:scale(var(--s,.3));pointer-events:none;background:#fff;opacity:0;transition:opacity .6s}
 .cframe iframe.on{opacity:1}
 .cframe .site{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;color:var(--muted)}
 .cmore{margin-top:clamp(36px,5vw,64px);display:inline-flex;align-items:center;gap:14px;font:italic 300 clamp(20px,1.9vw,26px) var(--sans);letter-spacing:-.04em;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:none;transition:color .2s,gap .3s var(--ease)}
@@ -628,7 +628,7 @@ if (P.mostrarCases && lista.length) {
       const capa = safeUrl(f.capa);
       const inner = f.embed === false
         ? (capa ? `<img src="${capa}" alt="${esc(nome)}" loading="lazy" decoding="async">` : `<span class="site">${esc(host(f.url))}</span>`)
-        : `<iframe data-src="${url}" title="${esc(nome)}" tabindex="-1" aria-hidden="true" loading="lazy" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>`;
+        : `<iframe data-src="${url}" title="${esc(nome)}" tabindex="-1" aria-hidden="true" loading="lazy" scrolling="no" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer"></iframe>`;
       return f.abreLink === false ? `<div class="cframe">${inner}</div>` : `<a class="cframe" href="${url}" target="_blank" rel="noopener" aria-label="${esc(nome)} (abre o site)">${inner}</a>`;
     }
     const src = safeUrl(f.thumb) || url; // quadro: versão média; galeria: original em alta
