@@ -119,12 +119,19 @@ a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 
 .g-prev{left:var(--pad)}.g-next{right:var(--pad)}
 .g-close svg,.g-nav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;display:block}
 @media (min-width:761px){.g-slide{padding-left:calc(var(--pad) + 64px);padding-right:calc(var(--pad) + 64px)}} /* foto não fica sob as setas */
-@media (max-width:760px){.g-nav{display:none}}
+@media (max-width:760px){
+  /* celular: setas embaixo, centralizadas (além do arrastar) */
+  .g-slide{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+  .g-nav{top:auto;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:none;width:56px;height:56px}
+  .g-prev{left:calc(50% - 68px)}.g-next{right:calc(50% - 68px)}
+  .g-nav:disabled{opacity:.25}
+}
 @media (max-width:760px){
   .cgroup{grid-template-columns:1fr}
   .cgroup-label{position:sticky;top:68px;z-index:2;margin:0 calc(var(--pad) * -1) 8px;padding:6px var(--pad) 14px;background:linear-gradient(var(--paper) 78%,rgba(247,247,247,0))}
   .cgroup-label span{position:static;writing-mode:horizontal-tb;transform:none;font-size:clamp(44px,14vw,64px);line-height:.9}
   .cframes{grid-template-columns:1fr}
+  .cframes .cframe:nth-child(n+2){display:none} /* celular: só o 1º quadro; a galeria tem todas */
 }
 
 .hero h1{font-size:clamp(40px,calc(6vw + 28px),132px);line-height:.9;letter-spacing:-.03em;display:flex;flex-direction:column} /* flex: as margens negativas das linhas somam (não colapsam) */
