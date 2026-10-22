@@ -131,7 +131,7 @@ a.cframe:hover,button.cframe:hover{transform:translateY(-4px);box-shadow:0 20px 
   .cgroup{grid-template-columns:1fr;position:relative}
   .cgroup-label{position:absolute;top:0;right:0;bottom:0;z-index:0;pointer-events:none}
   .cgroup-label span{position:sticky;top:96px;font-size:clamp(56px,17vw,76px)}
-  .cgroup > div:last-child{position:relative;z-index:1;padding-top:clamp(120px,34vw,150px)}
+  .cgroup > div:last-child{position:relative;z-index:1;padding-top:calc(var(--lh,140px) + 20px)} /* --lh: comprimento do nome (medido) */
   .cframes{grid-template-columns:1fr}
   .cframes .cframe:nth-child(n+2){display:none} /* celular: só o 1º quadro; a galeria tem todas */
 }
@@ -662,6 +662,11 @@ if (P.mostrarCases && lista.length) {
       : modo === "link" && link ? `<a class="cmore" href="${link}" target="_blank" rel="noopener">Ver mais <span>→</span></a>` : "";
     return `<div class="cgroup"><div class="cgroup-label" aria-hidden="true"><span>${esc(cat.nome)}</span></div><div>${projs}${more}</div></div>`;
   }).join("");
+
+  // celular: o espaço acima do 1º projeto acompanha o comprimento do nome da categoria
+  const medeNomes = () => $$(".cgroup").forEach(g => g.style.setProperty("--lh", g.querySelector(".cgroup-label span").offsetHeight + "px"));
+  medeNomes(); addEventListener("resize", medeNomes);
+  document.fonts?.ready.then(medeNomes);
 
   // "Ver mais": revela os projetos ocultos daquela categoria
   $$("[data-more]").forEach(b => b.addEventListener("click", () => {
