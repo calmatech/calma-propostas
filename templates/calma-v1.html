@@ -152,21 +152,28 @@ a.case:hover img{transform:scale(1.04)}
 .person:hover .ph img{transform:scale(1.12)}
 .person h3{font-size:clamp(30px,3.4vw,40px);line-height:1;margin-bottom:12px}
 .person p{font-size:14px;line-height:1.7;margin:0}
-.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:clamp(72px,10vw,120px);border-top:1px solid var(--night-line);padding-top:clamp(32px,4vw,48px)}
-.nums b{display:block;font:400 clamp(64px,9vw,120px)/1 var(--serif);letter-spacing:-.03em}
-.nums div>span{font-size:15px;color:var(--night-muted)}
-/* logos de clientes: 3 linhas (3 · 4 · 3) na largura do conteúdo; celular: 2 colunas. Altura individual: --h (px no desktop) */
-.clients{list-style:none;margin:clamp(72px,9vw,120px) 0 0;padding:0;display:grid;grid-template-columns:repeat(12,minmax(0,1fr));row-gap:clamp(48px,7vw,96px);align-items:center}
-.clients li{grid-column:span 4;display:flex;justify-content:center}
-.clients li:nth-child(n+4):nth-child(-n+7){grid-column:span 3}
-.clients li:nth-child(1),.clients li:nth-child(4),.clients li:nth-child(8){justify-content:flex-start}
-.clients li:nth-child(3),.clients li:nth-child(7),.clients li:nth-child(10){justify-content:flex-end}
-.clients img{width:auto;max-width:100%;height:clamp(calc(var(--h) * .6px),calc(var(--h) * .1vw),calc(var(--h) * 1px))}
+/* números + clientes: cópia da composição de referência (largura 1527 × altura 1150 entre as linhas).
+   No desktop tudo é proporcional à largura (cqw); no celular vira números lado a lado + logos em 2 colunas. */
+.proof{position:relative;container-type:inline-size;aspect-ratio:1527/1150;margin-top:clamp(72px,10vw,120px);border-top:1px solid var(--night-line);border-bottom:1px solid var(--night-line)}
+.proof-mid{position:absolute;left:0;right:0;top:34%;height:1px;background:var(--night-line)}
+.proof .num{position:absolute;left:var(--x);top:var(--y);margin-top:var(--ny,-1.6cqw)}
+.proof .num b{display:block;font:400 var(--nf,12.25cqw)/1 var(--serif);letter-spacing:-.03em;white-space:nowrap;margin-left:var(--nx,-.076cqw)}
+.proof .num>span{display:block;font-size:var(--lf,1.45cqw);color:var(--night-muted);margin-top:var(--lm,.03cqw);white-space:nowrap}
+.proof .clients{list-style:none;margin:0;padding:0}
+.proof .clients li{position:absolute;left:var(--x);top:var(--y);width:var(--w)}
+.proof .clients img{display:block;width:100%;height:auto}
 @media (max-width:760px){
-  .clients{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:44px}
-  .clients li:nth-child(n):nth-child(n){grid-column:auto;justify-content:flex-start} /* vence as regras de 3·4·3 */
-  .clients li:nth-child(2n):nth-child(n){justify-content:flex-end}
-  .clients img{height:calc(var(--h) * .7px)}
+  .proof{aspect-ratio:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 12px;padding:28px 0 0}
+  .proof-mid{display:none}
+  .proof .num{position:static;margin:0}
+  .proof .num b{margin-left:0}
+  .proof .num b{font-size:clamp(40px,13vw,56px)}
+  .proof .num>span{font-size:13px;margin-top:8px;white-space:normal;line-height:1.35}
+  .proof .clients{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 16px;align-items:center;margin-top:32px;padding:32px 0;border-top:1px solid var(--night-line)}
+  .proof .clients li{position:static;width:auto;display:flex}
+  .proof .clients li:nth-child(2n){justify-content:flex-end}
+  .proof .clients li:last-child:nth-child(odd){grid-column:1/-1;justify-content:center} /* número ímpar: último centralizado */
+  .proof .clients img{width:auto;height:var(--m);max-width:100%}
 }
 
 /* entrega */
@@ -288,7 +295,6 @@ a.case:hover img{transform:scale(1.04)}
 }
 @media (max-width:560px){
   .steps{grid-template-columns:1fr}
-  .nums{grid-template-columns:1fr;gap:28px}
   .person{grid-template-columns:1fr}.person .ph{width:112px}
   .next li{grid-template-columns:48px 1fr}.next span.d{grid-column:2;text-align:left}
   .next .here{display:flex;width:max-content;margin:12px 0 0;top:0}
@@ -386,23 +392,25 @@ a.case:hover img{transform:scale(1.04)}
         <div><h3>Giovanni Fonseca</h3><p class="muted">Designer estratégico e especialista em visual design com mais de 10 anos de experiência com produtos digitais e comunicação. Explora o design como linguagem de inovação, transformando complexidade em soluções simples, emocionais e significativas.</p></div>
       </div>
     </div>
-    <div class="nums">
-      <div class="rv"><b><span data-count="10">10</span>+</b><span>anos de experiência</span></div>
-      <div class="rv" style="--d:.1s"><b><span data-count="60">60</span>+</b><span>empresas atendidas</span></div>
-      <div class="rv" style="--d:.2s"><b><span data-count="150">150</span>+</b><span>projetos entregues</span></div>
+    <div class="proof">
+      <i class="proof-mid" aria-hidden="true"></i>
+      <div class="num rv" style="--x:0.982%;--y:8.957%;--ny:-1.336cqw;--d:0.0s"><b><span data-count="10">10</span>+</b><span>anos de experiência</span></div>
+      <div class="num rv" style="--x:40.144%;--y:9.043%;--ny:-1.401cqw;--d:0.1s"><b><span data-count="60">60</span>+</b><span>empresas atendidas</span></div>
+      <div class="num rv" style="--x:77.603%;--y:8.783%;--ny:-1.205cqw;--d:0.2s"><b><span data-count="150">150</span>+</b><span>projetos entregues</span></div>
+      <ul class="clients" aria-label="Clientes">
+        <li class="rv" style="--x:0.000%;--y:43.565%;--w:7.597%;--m:27px;--d:0.00s"><img src="/assets/clientes/nu.png" alt="Nubank" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:23.707%;--y:43.826%;--w:12.770%;--m:24px;--d:0.06s"><img src="/assets/clientes/turbi.png" alt="Turbi" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:54.748%;--y:44.261%;--w:12.246%;--m:23px;--d:0.12s"><img src="/assets/clientes/tedx.svg" alt="TEDx" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:84.217%;--y:44.000%;--w:12.574%;--m:26px;--d:0.18s"><img src="/assets/clientes/loggi.png" alt="Loggi" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:5.959%;--y:62.000%;--w:16.306%;--m:32px;--d:0.00s"><img src="/assets/clientes/prefeitura-sp.png" alt="Prefeitura de São Paulo" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:38.048%;--y:61.565%;--w:12.377%;--m:36px;--d:0.06s"><img src="/assets/clientes/sebrae.png" alt="Sebrae" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:65.881%;--y:63.130%;--w:19.581%;--m:22px;--d:0.12s"><img src="/assets/clientes/anbima.png" alt="Anbima" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:0.196%;--y:83.217%;--w:13.360%;--m:28px;--d:0.18s"><img src="/assets/clientes/cba.png" alt="CBA" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:27.374%;--y:80.783%;--w:7.400%;--m:45px;--d:0.00s"><img src="/assets/clientes/alana.png" alt="Instituto Alana" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:50.229%;--y:81.478%;--w:22.855%;--m:44px;--d:0.06s"><img src="/assets/clientes/unidos.svg" alt="+Unidos" loading="lazy" decoding="async"></li>
+        <li class="rv" style="--x:86.771%;--y:81.217%;--w:10.740%;--m:49px;--d:0.12s"><img src="/assets/clientes/gpts.png" alt="Great Place to Study" loading="lazy" decoding="async"></li>
+      </ul>
     </div>
-    <ul class="clients" aria-label="Clientes">
-      <li class="rv" style="--d:0.00s"><img src="/assets/clientes/nu.png" alt="Nubank" width="292" height="161" style="--h:42" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.06s"><img src="/assets/clientes/turbi.png" alt="Turbi" width="476" height="142" style="--h:38" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.12s"><img src="/assets/clientes/loggi.png" alt="Loggi" width="495" height="162" style="--h:41" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.00s"><img src="/assets/clientes/prefeitura-sp.png" alt="Prefeitura de São Paulo" width="660" height="204" style="--h:50" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.06s"><img src="/assets/clientes/sebrae.png" alt="Sebrae" width="491" height="224" style="--h:56" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.12s"><img src="/assets/clientes/tedx.svg" alt="TEDx" width="686" height="202" style="--h:38" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.18s"><img src="/assets/clientes/alana.png" alt="Instituto Alana" width="281" height="265" style="--h:66" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.00s"><img src="/assets/clientes/cba.png" alt="CBA" width="504" height="167" style="--h:44" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.06s"><img src="/assets/clientes/anbima.png" alt="Anbima" width="735" height="128" style="--h:34" loading="lazy" decoding="async"></li>
-      <li class="rv" style="--d:0.12s"><img src="/assets/clientes/gpts.png" alt="Great Place to Study" width="412" height="293" style="--h:76" loading="lazy" decoding="async"></li>
-    </ul>
   </div>
 </section>
 
