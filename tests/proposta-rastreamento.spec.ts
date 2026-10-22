@@ -69,24 +69,29 @@ test("com cases: grupos, site ao vivo, ver mais, ampliar imagem e rastreamento",
   await expect(page.locator(".cproj[hidden]")).toHaveCount(0);
   await expect(page.locator("a.cmore")).toHaveAttribute("href", /estudiocalma/);
   // imagem: clique abre a galeria do projeto (2 quadros + fotos extras), na foto clicada
-  const quadro = page.locator(".cproj", { hasText: "Lab Comportamental" }).locator("button.cframe").nth(1);
+  // no celular só o 1º quadro aparece; no desktop clica no 2º
+  const quadros = page.locator(".cproj", { hasText: "Lab Comportamental" }).locator("button.cframe");
+  const celular = !(await quadros.nth(1).isVisible());
+  const quadro = celular ? quadros.first() : quadros.nth(1);
+  const inicio = celular ? 1 : 2;
   await quadro.scrollIntoViewIfNeeded();
   await page.waitForTimeout(300);
   const y = await page.evaluate(() => scrollY);
   await quadro.click();
   const g = page.locator("dialog.gallery");
   await expect(g).toBeVisible();
-  await expect(g.locator(".g-count")).toHaveText("2 / 4");
+  await expect(g.locator(".g-count")).toHaveText(`${inicio} / 4`);
   await expect(page.locator("html")).toHaveClass(/g-lock/); // proposta não rola por trás
-  await page.keyboard.press("ArrowRight");
-  await expect(g.locator(".g-count")).toHaveText("3 / 4");
+  if (celular) await page.locator("[data-g-next]").click(); // setas embaixo no celular
+  else await page.keyboard.press("ArrowRight");
+  await expect(g.locator(".g-count")).toHaveText(`${inicio + 1} / 4`);
   // arrastar para a esquerda avança
   const box = (await g.locator(".g-stage").boundingBox())!;
   await page.mouse.move(box.x + box.width * 0.7, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width * 0.2, box.y + box.height / 2, { steps: 8 });
   await page.mouse.up();
-  await expect(g.locator(".g-count")).toHaveText("4 / 4");
+  await expect(g.locator(".g-count")).toHaveText(`${inicio + 2} / 4`);
   await page.locator("[data-g-close]").click();
   await expect(g).toBeHidden();
   await expect(page.locator("html")).not.toHaveClass(/g-lock/);
